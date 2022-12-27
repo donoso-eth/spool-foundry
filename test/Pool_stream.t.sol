@@ -74,6 +74,7 @@ contract PoolStream is Test, DeployPool, Report, DecodeFile {
     checkFilePool("./test/expected/test-stream/expected4.json");
     checkFileUser("./test/expected/test-stream/4-user-expected1.json", user1);
     checkFileUser("./test/expected/test-stream/4-user-expected2.json", user2);
+    // #endregion =================   FOURTH PERIOD ============================= //
 
     // #region =================  5th PERIOD ============================= //
     vm.warp(block.timestamp + 30 days);
@@ -92,9 +93,6 @@ contract PoolStream is Test, DeployPool, Report, DecodeFile {
     console.log(97);
     initialBuffer = 1 hours * uint96(flowRate60);
     initialWithdraw = 4 hours * uint96(flowRate60);
-
-    console.log(initialBuffer + initialWithdraw);
-    console.log(initialBuffer + initialWithdraw - getFlowDeposit(address(poolProxy), user2));
 
     checkFilePool("./test/expected/test-stream/expected6.json");
     checkFileUser("./test/expected/test-stream/6-user-expected1.json", user1);

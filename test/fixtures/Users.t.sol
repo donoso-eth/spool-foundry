@@ -75,6 +75,12 @@ abstract contract Users is Test, Config {
     vm.stopPrank();
   }
 
+  function updateFlow(address sender,int96 flowRate) internal {
+    vm.startPrank(sender);
+    _cfaLib.updateFlow( address(poolProxy), superToken, flowRate);
+    vm.stopPrank();
+  }
+
   function redeemFlow(address sender, int96 flowRate) internal {
     vm.startPrank(sender);
     poolProxy.redeemFlow(flowRate);
