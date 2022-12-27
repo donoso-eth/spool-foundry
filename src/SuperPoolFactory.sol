@@ -71,7 +71,9 @@ contract SuperPoolFactory is Initializable, UUPSProxiable {
     ERC20 token = ERC20(superToken.getUnderlyingToken());
     string memory tokenName = token.name();
     string memory symbol = token.symbol();
-
+    console.log(tokenName);
+    console.log(symbol);
+    console.logBytes32(bytes32(abi.encodePacked("sp", symbol)));
     /// Create Proxy Contracts
 
     UUPSProxy poolProxy = new UUPSProxy();
@@ -79,6 +81,8 @@ contract SuperPoolFactory is Initializable, UUPSProxiable {
 
     // UUPSProxy poolInternalProxy = new UUPSProxy();
     // poolInternalProxy.initializeProxy(poolInternalImpl);
+
+
 
     /////// Initializer Pool
     DataTypes.PoolInitializer memory poolInit;

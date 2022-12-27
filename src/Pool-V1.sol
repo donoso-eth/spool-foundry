@@ -71,6 +71,8 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     owner = poolInit.owner;
     poolFactory = msg.sender;
 
+    console.log(74,owner);
+
     MAX_INT = 2 ** 256 - 1;
 
     _cfaLib = CFAv1Library.InitData(host, cfa);
@@ -908,4 +910,11 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   }
 
   // #endregion ============ ===============  ERC20 implementation ============= ============= //
+  
+  function readStorageSlot(uint8 i) public view returns (bytes32 result) {
+        assembly {
+            result := sload(i)
+        }
+    }
+
 }
