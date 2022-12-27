@@ -86,6 +86,8 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
 
   ////////////// IN PRODUCTIONM REMOVE the 10**12 FACTOR aNR THE MINTING
   function _deposit(uint256 amountToDeposit) internal {
+    console.log(89,amountToDeposit);
+
     superToken.transferFrom(address(pool), address(this), uint256(amountToDeposit));
 
     superToken.downgrade(amountToDeposit);

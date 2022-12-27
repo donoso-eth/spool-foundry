@@ -55,10 +55,7 @@ contract PoolTreasury is Test, DeployPool, Report, DecodeFile {
     int96 flowRate2 = int96(uint96(uint256(150 ether).div(30 days)));
 
     redeemFlow(user1, flowRate2);
-    uint256 initialBuffer = 1 hours * uint96(flowRate2);
-    uint256 initialWithdraw = 4 hours * uint96(flowRate2);
-    uint256 nextExec = (poolProxy.balanceOf(user1).sub(initialBuffer.add(initialWithdraw))).div(uint96(flowRate2));
-
+    
     checkFilePool("./test/expected/treasury/expected3.json");
     checkFileUser("./test/expected/treasury/3-user-expected1.json", user1);
     checkFileUser("./test/expected/treasury/3-user-expected2.json", user2);

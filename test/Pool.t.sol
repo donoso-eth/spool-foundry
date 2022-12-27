@@ -18,9 +18,9 @@ contract PoolTest is Test, DeployPool, Report {
     payable(poolProxy).transfer(1 ether);
   }
 
-  function testFuzzRedeemFlow(uint8 userInt, int96 flowRate) public {
+  function testFuzzRedeemFlow(int96 flowRate) public {
     vm.assume(flowRate > 1000000000000);
-    address user = getUser(userInt);
+    address user = user1;
 
     DataTypes.Pool memory currentPool;
 
@@ -38,9 +38,6 @@ contract PoolTest is Test, DeployPool, Report {
       vm.warp(block.timestamp + 24 * 3600);
 
       redeemFlow(user, flowRate);
-      currentPool = logCurrentPool();
-      int96 netFlow;
-      netFlow = currentPool.inFlowRate - currentPool.outFlowRate;
     }
 
     invariantTest();
@@ -88,31 +85,6 @@ contract PoolTest is Test, DeployPool, Report {
     invariantTest();
   }
 
-  function testBalance() public {
-    sendToPool(user1, 150 ether);
-    redeemFlow(user1, 1000000000000);
-    (int256 bal, uint256 deposit,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
-
-    vm.warp(block.timestamp + 24 * 3600);
-    (bal,,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
-
-    gelatoBalance();
-    (bal, deposit,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
-
-    vm.warp(block.timestamp + 24 * 3600);
-    (bal,,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
-    console.log(110, uint256(bal));
-    vm.warp(block.timestamp + 24 * 3600);
-    (bal,,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
-    console.log(113, uint256(-bal));
-
-    sendToPool(user1, 82800000000000000);
-    (bal,,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
-    console.log(117, uint256(bal));
-    console.log(118, uint256(bal));
-    invariantTest();
-  }
-
   function testRedeemFlow() public {
     int96 flowRate = 1000000000000;
     address user = user2;
@@ -132,9 +104,7 @@ contract PoolTest is Test, DeployPool, Report {
     vm.warp(block.timestamp + 24 * 3600);
 
     redeemFlow(user, flowRate);
-    currentPool = logCurrentPool();
-    netFlow = currentPool.inFlowRate - currentPool.outFlowRate;
-
+   
     invariantTest();
   }
 
@@ -161,9 +131,12 @@ contract PoolTest is Test, DeployPool, Report {
 
     uint256 user1Bal = poolProxy.balanceOf(user);
     uint256 aaveBal = aToken.balanceOf(address(strategyProxy));
-
+ 
     assertEq(aaveBal, depositAmount / 10 ** 12);
     assertEq(user1Bal, depositAmount);
+
+
+    invariantTest();
 
     withdrawFromPool(user, withdrawAmount);
 
@@ -172,6 +145,8 @@ contract PoolTest is Test, DeployPool, Report {
 
     assertEq(aaveBal, (depositAmount - withdrawAmount) / 10 ** 12);
     assertEq(user1Bal, (depositAmount - withdrawAmount));
+  
+    invariantTest();
 
     vm.expectRevert(bytes("NOT_ENOUGH_BALANCE"));
     withdrawFromPool(user, withdrawAmount * 2);
@@ -218,8 +193,9 @@ contract PoolTest is Test, DeployPool, Report {
 
     uint256 err = 1;
 
-    if (err > 1) {
-      assertGe(poolBalance, usersBalance);
+    if (diff != 1) {
+          assertApproxEqRel(poolBalance, usersBalance,1e17);
+          //assertGe(poolBalance, usersBalance);
     }
   }
 

@@ -161,7 +161,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
    * @param from Supplier (user sending tokens)
    * @param amount amount received
    */
-  function tokensReceived(address operator, address from, address to, uint256 amount, bytes calldata userData, bytes calldata operatorData) external override (IERC777Recipient, IPoolV1) {
+  function tokensReceived(address, address from, address, uint256 amount, bytes calldata, bytes calldata ) external override (IERC777Recipient, IPoolV1) {
     require(msg.sender == address(superToken), "INVALID_TOKEN");
     require(amount > 0, "AMOUNT_TO_BE_POSITIVE");
 
@@ -205,7 +205,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     DataTypes.SupplierEvent flowEvent = suppliersByAddress[_supplier].outStream.flow > 0 ? DataTypes.SupplierEvent.OUT_STREAM_UPDATE : DataTypes.SupplierEvent.OUT_STREAM_START;
 
-    bytes memory data = callInternal(abi.encodeWithSignature("_redeemFlow(address,int96)", _supplier, _outFlowRate));
+    callInternal(abi.encodeWithSignature("_redeemFlow(address,int96)", _supplier, _outFlowRate));
 
     emitEvents(_supplier);
 
@@ -299,7 +299,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     uint256 fromBalance = balanceOf(from);
     require(fromBalance >= amount, "NOT_ENOUGH_BALANCE");
 
-    DataTypes.Supplier memory supplier = suppliersByAddress[from];
+  //  DataTypes.Supplier memory supplier = suppliersByAddress[from];
 
     //TODO MIN BALANCE
 
@@ -446,7 +446,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     transfer(fee, feeToken);
 
-    callInternal(abi.encodeWithSignature("_balanceTreasury()"));
+   callInternal(abi.encodeWithSignature("_balanceTreasuryFromGelato()"));
   }
 
   function checkerLastExecution() external view returns (bool canExec, bytes memory execPayload) {
@@ -463,7 +463,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
   // #region ============ ===============  Internal && Pool Internal Functions   ============= ============= //
 
-  function transfer(uint256 _amount, address _paymentToken) internal {
+  function transfer(uint256 _amount, address ) internal {
     // _transfer(_amount, _paymentToken);
     // callInternal(abi.encodeWithSignature("_transfer(uint256,address)", _amount, _paymentToken));
     (bool success,) = gelato.call{value: _amount}("");
@@ -667,7 +667,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
    * no way affects any of the arithmetic of the contract, including
    * {IERC20-balanceOf} and {IERC20-transfer}.
    */
-  function decimals() public view returns (uint8) {
+  function decimals() public pure returns (uint8) {
     return 18;
   }
 

@@ -32,18 +32,15 @@ abstract contract DecodeFile is Test, Config, Users, Gelato {
     assertEq(block.timestamp, ePool.timestamp, "TIMESTAMP");
     console.log("TIMESTAMP ----> ", block.timestamp, ePool.timestamp);
 
-    uint256 flowDeposit = 0; //
-    uint256 deposit1 = getFlowDeposit(address(poolProxy), user1);
-    uint256 deposit2 = getFlowDeposit(address(poolProxy), user2);
-    uint256 deposit3 = getFlowDeposit(address(poolProxy), user3);
+
 
     (int256 availableBalance,,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
 
     uint256 superTokenBalance = uint256(availableBalance);
-    console.log(41, superTokenBalance);
-    assertEq(superTokenBalance + flowDeposit, ePool.poolBalance, "POOL_SUPERTOKEN_BALANCE");
-    console.log("POOL_SUPERTOKEN_BALANCE ----> ", superTokenBalance, flowDeposit, ePool.poolBalance);
-    console.log("DEPOSIT----> ", deposit1, deposit2, deposit3);
+
+    assertEq(superTokenBalance , ePool.poolBalance, "POOL_SUPERTOKEN_BALANCE");
+    console.log("POOL_SUPERTOKEN_BALANCE ----> ", superTokenBalance, ePool.poolBalance);
+ 
 
     uint256 aaveBalance = aToken.balanceOf(address(strategyProxy));
     assertApproxEqRel(aaveBalance, ePool.aaveBalance, 1e12, "AAVE Balance ");
@@ -140,12 +137,8 @@ abstract contract DecodeFile is Test, Config, Users, Gelato {
 
     if (supplier.outStream.flow > 0 && supplier.timestamp == supplier.outStream.streamInit) {
       bytes32 taskId = gelatoTaskId(user, supplier.outStream.streamInit, supplier.outStream.streamDuration);
-
-      // uint256 addTime =
-      bytes32 taskId2 = gelatoTaskId(user, block.timestamp, 37647377);
       assertEq32(supplier.outStream.cancelWithdrawId, taskId, "TASKID");
-      console.logBytes32(taskId);
-      console.logBytes32(taskId2);
+  
     }
 
     assertApproxEqRel(supplier.outStream.streamDuration, eUser.outStepTime, 1e12, "STREAM DURATION");

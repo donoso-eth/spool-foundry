@@ -10,7 +10,7 @@ interface IUUPSProxiable {
    */
   function getCodeAddress() external view returns (address codeAddress);
 
-  function updateCode(address newAddress) external virtual;
+  function updateCode(address newAddress) external ;
 
   /**
    * @dev Proxiable UUID marker function, this would help to avoid wrong logic
@@ -19,7 +19,7 @@ interface IUUPSProxiable {
    * NOTE: The semantics of the UUID deviates from the actual UUPS standard,
    *       where it is equivalent of _IMPLEMENTATION_SLOT.
    */
-  function proxiableUUID() external view virtual returns (bytes32);
+  function proxiableUUID() external view returns (bytes32);
 
   /**
    * @dev Update code address function.
