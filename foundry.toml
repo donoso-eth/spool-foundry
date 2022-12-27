@@ -1,0 +1,21 @@
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib']
+optimizer = true
+optimizer_runs = 1000
+solc = '0.8.17'
+fs_permissions = [{ access = "read-write", path = "./test"}]
+
+[fuzz]
+runs = 1000
+
+[fmt]
+line_length = 300
+tab_width = 2
+bracket_spacing = true
+
+# etherscan_api_key = '8YIR2SATQRH4HV2FQBHWJIV1HMFCNYQI8V'
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+
+
