@@ -28,11 +28,11 @@ contract PoolStateV1 {
 
   // #region pool state
 
-  address public owner;
-  address public poolFactory;
+  address owner;
+  address  poolFactory;
 
-  uint256 public lastPoolTimestamp;
-  uint256 public lastExecution;
+  uint256 lastPoolTimestamp;
+  uint256  lastExecution;
   //// TOKENS
   ISuperToken superToken;
   IERC20 token;
@@ -47,32 +47,32 @@ contract PoolStateV1 {
 
   //// PARAMETERS
 
-  uint256 MAX_INT;
+  uint256 constant MAX_INT = 2 ** 256 - 1;
 
-  uint256 public PRECISSION;
+  uint256 constant PRECISSION = 1_000_000;
 
-  uint256 public SUPERFLUID_DEPOSIT;
-  uint256 public POOL_BUFFER; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
-  uint256 public MIN_OUTFLOW_ALLOWED; // 1 hour minimum flow == Buffer
+  uint256 constant  SUPERFLUID_DEPOSIT = 4 * 3600;
+  uint256 constant POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
+  uint256 constant MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 hour minimum flow == Buffer
 
-  uint256 public DEPOSIT_TRIGGER_AMOUNT;
-  uint256 public BALANCE_TRIGGER_TIME;
+  uint256 constant DEPOSIT_TRIGGER_AMOUNT = 100 ether;
+  uint256 constant BALANCE_TRIGGER_TIME = 24 * 3600;
 
-  uint256 public PROTOCOL_FEE;
+  uint256 constant PROTOCOL_FEE = 3;
 
   address public poolStrategy;
   address public poolInternal;
 
   /// POOL STATE
 
-  uint256 public poolId;
-  uint256 public supplierId;
+  uint256 poolId;
+  uint256 supplierId;
 
-  mapping(address => DataTypes.Supplier) public suppliersByAddress;
+  mapping(address => DataTypes.Supplier) suppliersByAddress;
 
-  mapping(uint256 => DataTypes.Pool) public poolByTimestamp;
+  mapping(uint256 => DataTypes.Pool) poolByTimestamp;
 
-  CFAv1Library.InitData public _cfaLib;
-  ISuperfluid public host; // host
-  IConstantFlowAgreementV1 public cfa; // the stored constant flow agreement class address
+  CFAv1Library.InitData  _cfaLib;
+  ISuperfluid  host; // host
+  IConstantFlowAgreementV1  cfa; // the stored constant flow agreement class address
 }

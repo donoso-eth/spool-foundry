@@ -70,20 +70,13 @@ library DataTypes {
   struct Supplier {
     uint256 id;
     address supplier;
-    uint256 cumulatedYield;
     uint256 deposit;
     uint256 timestamp;
     uint256 createdTimestamp;
-    uint256 eventId;
     int96 inStream;
     OutStream outStream;
-    APY apy;
   }
 
-  struct APY {
-    uint256 span;
-    uint256 apy;
-  }
 
   struct Yield {
     uint256 yieldTokenIndex;
@@ -101,7 +94,6 @@ library DataTypes {
     uint256 id;
     uint256 timestamp;
     uint256 nrSuppliers;
-    // uint256 totalShares;
     uint256 deposit;
     uint256 depositFromInFlowRate;
     uint256 depositFromOutFlowRate;
@@ -109,7 +101,6 @@ library DataTypes {
     int96 outFlowRate;
     uint256 outFlowBuffer;
     Yield yieldObject;
-    APY apy;
   }
 
   enum SupplierEvent {
@@ -120,11 +111,9 @@ library DataTypes {
     STREAM_UPDATE, //(int96)
     STREAM_STOP, //
     OUT_STREAM_START,
-    //(int96)
     OUT_STREAM_UPDATE, //(int96)
     OUT_STREAM_STOP, //
     PUSH_TO_STRATEGY,
-    //(uint256)
     WITHDRAW_STEP, //
     REBALANCE
   }

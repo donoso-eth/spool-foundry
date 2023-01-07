@@ -72,12 +72,6 @@ interface IPoolV1 {
 
   // #region =========== =============  PARAMETERS ONLY OWNER  ============= ============= //
 
-  function setPoolBuffer(uint256 _poolBuffer) external;
-
-  function setDepositTriggerAmount(uint256 _amount) external;
-
-  function setDepositTriggerTime(uint256 _time) external;
-
   function setInternalContract(address _poolInternal) external;
   // #endregion =========== =============  PARAMETERS ONLY OWNER  ============= ============= //
 }

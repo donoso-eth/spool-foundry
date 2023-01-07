@@ -71,9 +71,8 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     owner = poolInit.owner;
     poolFactory = msg.sender;
 
-    console.log(74,owner);
 
-    MAX_INT = 2 ** 256 - 1;
+    //MAX_INT = 2 ** 256 - 1;
 
     _cfaLib = CFAv1Library.InitData(host, cfa);
 
@@ -88,16 +87,16 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     ops = poolInit.ops;
     gelato = ops.gelato();
 
-    PRECISSION = 1_000_000;
-    MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 Day minimum flow == Buffer
+    // PRECISSION = 1_000_000;
+   // MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 Day minimum flow == Buffer
 
-    POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
-    SUPERFLUID_DEPOSIT = 4 * 3600;
+    //POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
+    //SUPERFLUID_DEPOSIT = 4 * 3600;
 
-    DEPOSIT_TRIGGER_AMOUNT = 100 ether;
-    BALANCE_TRIGGER_TIME = 3600 * 24;
+    // DEPOSIT_TRIGGER_AMOUNT = 100 ether;
+    // BALANCE_TRIGGER_TIME = 3600 * 24;
 
-    PROTOCOL_FEE = 3;
+    //PROTOCOL_FEE = 3;
 
     poolStrategy = address(poolInit.poolStrategy);
     poolInternal = poolInit.poolInternal;
@@ -106,8 +105,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     superToken.approve(address(poolStrategy), MAX_INT);
 
     lastPoolTimestamp = block.timestamp;
-    poolByTimestamp[block.timestamp] = DataTypes.Pool(0, block.timestamp, 0, 0, 0, 0, 0, 0, 0, DataTypes.Yield(0, 0, 0, 0, 0, 0, 0), DataTypes.APY(0, 0));
-    lastExecution = block.timestamp;
+    poolByTimestamp[block.timestamp].timestamp = block.timestamp;
 
     bytes memory data = callInternal(abi.encodeWithSignature("_createBalanceTreasuryTask()"));
 
@@ -298,12 +296,9 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     _beforeTokenTransfer(from, to, amount);
 
-    uint256 fromBalance = balanceOf(from);
-    require(fromBalance >= amount, "NOT_ENOUGH_BALANCE");
 
-  //  DataTypes.Supplier memory supplier = suppliersByAddress[from];
+    require(balanceOf(from)>= amount, "NOT_ENOUGH_BALANCE");
 
-    //TODO MIN BALANCE
 
     callInternal(abi.encodeWithSignature("transferSTokens(address,address,uint256)", from, to, amount));
 
@@ -320,12 +315,11 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     emit Events.SupplierUpdate(toSupplier);
   }
 
-  function totalSupply() public view override (IPoolV1, IERC20) returns (uint256) {
+  function totalSupply() public view override (IPoolV1, IERC20) returns (uint256 _totalSupply) {
     DataTypes.Pool memory lastPool = poolByTimestamp[lastPoolTimestamp];
     uint256 periodSpan = block.timestamp - lastPool.timestamp;
-    uint256 _totalSupply = lastPool.deposit + uint96(lastPool.inFlowRate) * periodSpan - uint96(lastPool.outFlowRate) * periodSpan;
+   _totalSupply = lastPool.deposit + uint96(lastPool.inFlowRate) * periodSpan - uint96(lastPool.outFlowRate) * periodSpan;
 
-    return _totalSupply;
   }
 
   // #endregion overriding ERC20
@@ -357,7 +351,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     return newCtx;
   }
 
-  ///// NOT YET FINAL IMPLEMNTATION
+
   function afterAgreementTerminated(
     ISuperToken, /*superToken*/
     address, /*agreementClass*/
@@ -376,7 +370,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
       bytes memory payload = abi.encode("");
       emit Events.SupplierEvent(DataTypes.SupplierEvent.STREAM_STOP, payload, block.timestamp, sender);
     } else if (sender == address(this)) {
-      // poolInternal._redeemFlowStop(receiver);
+    
       callInternal(abi.encodeWithSignature("_redeemFlowStop(address)", receiver));
 
       emitEvents(receiver);
@@ -488,17 +482,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
   // #region ============ ===============  PARAMETERS ONLY OWNER  ============= ============= //
 
-  function setPoolBuffer(uint256 _poolBuffer) external onlyOwner {
-    POOL_BUFFER = _poolBuffer;
-  }
-
-  function setDepositTriggerAmount(uint256 _amount) external onlyOwner {
-    DEPOSIT_TRIGGER_AMOUNT = _amount;
-  }
-
-  function setDepositTriggerTime(uint256 _time) external onlyOwner {
-    BALANCE_TRIGGER_TIME = _time;
-  }
 
   function setInternalContract(address _poolInternal) external onlyOwner {
     poolInternal = _poolInternal;

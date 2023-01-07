@@ -92,6 +92,7 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
 
     superToken.downgrade(amountToDeposit);
 
+    // COMMENT
     aaveToken.mint(amountToDeposit / (10 ** 12));
 
     if (amountToDeposit / (10 ** 12) > 0) {
