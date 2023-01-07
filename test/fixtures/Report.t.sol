@@ -45,9 +45,12 @@ abstract contract Report is Test, Users, Gelato {
     uint256 depositUser4 = getFlowDeposit(address(poolProxy), user4).div(10 ** 12);
 
     uint256 deposit = depositUser1 + depositUser2 + depositUser3 + depositUser4;
-
+    console.log(48,deposit);
+    console.log(49,aaveBalance);
+    console.log(50, superTokenBalance);
+    console.log(50, superTokenBalance + aaveBalance);
     poolBalance = superTokenBalance + aaveBalance + deposit;
 
-    console.log(48,poolBalance);
+    console.log(51,poolBalance);
   }
 }
