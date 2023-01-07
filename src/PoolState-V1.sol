@@ -15,6 +15,10 @@ import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 
 contract PoolStateV1 {
+
+  bool paused = false; 
+
+
   //ERC20
 
   mapping(address => uint256) public _balances;
