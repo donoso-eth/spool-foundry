@@ -15,9 +15,7 @@ import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 
 contract PoolStateV1 {
-
-  bool paused = false; 
-
+  bool emergency = false;
 
   //ERC20
 
@@ -33,10 +31,10 @@ contract PoolStateV1 {
   // #region pool state
 
   address owner;
-  address  poolFactory;
+  address poolFactory;
 
   uint256 lastPoolTimestamp;
-  uint256  lastExecution;
+  uint256 lastExecution;
   //// TOKENS
   ISuperToken superToken;
   IERC20 token;
@@ -55,7 +53,7 @@ contract PoolStateV1 {
 
   uint256 constant PRECISSION = 1_000_000;
 
-  uint256 constant  SUPERFLUID_DEPOSIT = 4 * 3600;
+  uint256 constant SUPERFLUID_DEPOSIT = 4 * 3600;
   uint256 constant POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
   uint256 constant MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 hour minimum flow == Buffer
 
@@ -76,7 +74,7 @@ contract PoolStateV1 {
 
   mapping(uint256 => DataTypes.Pool) poolByTimestamp;
 
-  CFAv1Library.InitData  _cfaLib;
-  ISuperfluid  host; // host
-  IConstantFlowAgreementV1  cfa; // the stored constant flow agreement class address
+  CFAv1Library.InitData _cfaLib;
+  ISuperfluid host; // host
+  IConstantFlowAgreementV1 cfa; // the stored constant flow agreement class address
 }

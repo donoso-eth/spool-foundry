@@ -31,8 +31,8 @@ abstract contract Report is Test, Users, Gelato {
     usersBalance = poolProxy.balanceOf(user1).div(10 ** 12) + poolProxy.balanceOf(user2).div(10 ** 12) + poolProxy.balanceOf(user3).div(10 ** 12) + poolProxy.balanceOf(user4).div(10 ** 12);
     DataTypes.Pool memory currentPool = poolProxy.getLastPool();
     usersBalance = usersBalance + currentPool.yieldObject.protocolYield;
-    console.log(31,currentPool.yieldObject.protocolYield);
-    console.log(32,usersBalance);
+    console.log(31, currentPool.yieldObject.protocolYield);
+    console.log(32, usersBalance);
   }
 
   function calculatePoolTotalBalance() internal view returns (uint256 poolBalance) {
@@ -45,12 +45,12 @@ abstract contract Report is Test, Users, Gelato {
     uint256 depositUser4 = getFlowDeposit(address(poolProxy), user4).div(10 ** 12);
 
     uint256 deposit = depositUser1 + depositUser2 + depositUser3 + depositUser4;
-    console.log(48,deposit);
-    console.log(49,aaveBalance);
+    console.log(48, deposit);
+    console.log(49, aaveBalance);
     console.log(50, superTokenBalance);
     console.log(50, superTokenBalance + aaveBalance);
     poolBalance = superTokenBalance + aaveBalance + deposit;
 
-    console.log(51,poolBalance);
+    console.log(51, poolBalance);
   }
 }

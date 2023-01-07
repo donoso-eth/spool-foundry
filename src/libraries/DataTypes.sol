@@ -72,7 +72,6 @@ library DataTypes {
     address supplier;
     uint256 deposit;
     uint256 timestamp;
-    uint256 createdTimestamp;
     int96 inStream;
     OutStream outStream;
   }

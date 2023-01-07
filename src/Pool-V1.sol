@@ -204,7 +204,7 @@ contract PoolV1 is
         uint256 amount,
         bytes calldata,
         bytes calldata
-    ) external override(IERC777Recipient, IPoolV1) onlyNotPaused {
+    ) external override(IERC777Recipient, IPoolV1) onlyNotEmergency {
         require(msg.sender == address(superToken), "INVALID_TOKEN");
         require(amount > 0, "AMOUNT_TO_BE_POSITIVE");
 
@@ -234,7 +234,7 @@ contract PoolV1 is
     function redeemDeposit(uint256 redeemAmount)
         external
         override
-        onlyNotPaused
+        onlyNotEmergency
     {
         address _supplier = msg.sender;
 
@@ -263,7 +263,7 @@ contract PoolV1 is
      *
      *    This method can be called to create a stream or update a previous one
      */
-    function redeemFlow(int96 _outFlowRate) external onlyNotPaused {
+    function redeemFlow(int96 _outFlowRate) external onlyNotEmergency {
         address _supplier = msg.sender;
 
         uint256 realTimeBalance = balanceOf(_supplier);
@@ -296,7 +296,7 @@ contract PoolV1 is
         );
     }
 
-    function taskClose(address _supplier) external onlyNotPaused onlyOps {
+    function taskClose(address _supplier) external onlyNotEmergency onlyOps {
         (uint256 fee, address feeToken) = IOps(ops).getFeeDetails();
 
         transfer(fee, feeToken);
@@ -309,7 +309,7 @@ contract PoolV1 is
      * @notice User stop the receiving stream
      *
      */
-    function redeemFlowStop() external onlyNotPaused {
+    function redeemFlowStop() external onlyNotEmergency {
         address _supplier = msg.sender;
 
         require(
@@ -340,7 +340,6 @@ contract PoolV1 is
 
     // #endregion User Interaction PoolEvents
 
-
     // #region ============ ===============  SUPERFLUID  ============= =============
     function afterAgreementCreated(
         ISuperToken _superToken,
@@ -354,7 +353,7 @@ contract PoolV1 is
         override
         onlyExpected(_superToken, _agreementClass)
         onlyHost
-        onlyNotPaused
+        onlyNotEmergency
         returns (bytes memory newCtx)
     {
         newCtx = _ctx;
@@ -441,7 +440,7 @@ contract PoolV1 is
         external
         override
         onlyExpected(_superToken, _agreementClass)
-        onlyNotPaused
+        onlyNotEmergency
         onlyHost
         returns (bytes memory newCtx)
     {
@@ -513,7 +512,7 @@ contract PoolV1 is
 
     // #region ============ ===============  BALANCE RREASURY =========== ==============
 
-    function balanceTreasury() external onlyOps onlyNotPaused {
+    function balanceTreasury() external onlyOps onlyNotEmergency {
         require(
             block.timestamp >= lastExecution + BALANCE_TRIGGER_TIME,
             "NOT_YET_READY"
@@ -651,8 +650,8 @@ contract PoolV1 is
         _;
     }
 
-    modifier onlyNotPaused() {
-        require(paused == false, "PAUSED");
+    modifier onlyNotEmergency() {
+        require(emergency == false, "PAUSED");
         _;
     }
 
@@ -817,7 +816,7 @@ contract PoolV1 is
     }
 
     // #region ============ ===============  ERC20 implementation ============= ============= //
-      function balanceOf(address _supplier)
+    function balanceOf(address _supplier)
         public
         view
         override(IPoolV1, IERC20)
@@ -911,7 +910,7 @@ contract PoolV1 is
             uint96(lastPool.outFlowRate) *
             periodSpan;
     }
-   
+
     /**
      * @dev Returns the name of the token.
      */
@@ -1226,6 +1225,51 @@ contract PoolV1 is
     }
 
     // #endregion ============ ===============  ERC20 implementation ============= ============= //
+
+    // #region =========== ================ EMERGENCY =========== ================ //
+
+    function setEmergency(bool _emergency) external onlyOwner () {
+        emergency = _emergency;
+    }
+    
+    
+    function emergencyCloseStream(
+        address[] memory sender,
+        address[] memory receiver
+    ) external onlyOwner {
+        if (emergency) {
+            for (uint256 i = 0; i < sender.length; i++) {
+                _cfaLib.deleteFlow(sender[i], receiver[i], superToken);
+                if (sender[i] == address(this)) {
+                    bytes32 taskId = suppliersByAddress[receiver[i]]
+                        .outStream
+                        .cancelWithdrawId;
+                    ops.cancelTask(taskId);
+                    suppliersByAddress[receiver[i]].outStream = DataTypes
+                        .OutStream(0, 0, 0, 0);
+                } else {
+                    suppliersByAddress[sender[i]].inStream = 0;
+                }
+            }
+        }
+    }
+
+    function emergencyUpdateBalanceSuppplier(
+        address[] memory suppliers,
+        uint256[] memory balances
+    ) external onlyOwner {
+        if (emergency) {
+            for (uint256 i = 0; i < suppliers.length; i++) {
+                DataTypes.Supplier storage supplier = suppliersByAddress[
+                    suppliers[i]
+                ];
+                supplier.deposit = balances[i];
+                supplier.timestamp = block.timestamp;
+            }
+        }
+    }
+
+    // #endregion =========== ================ EMERGENCY =========== ================ //
 
     function readStorageSlot(uint8 i) public view returns (bytes32 result) {
         assembly {
