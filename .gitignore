@@ -13,3 +13,5 @@ out/
 /lib
 
 /node_modules
+
+/types
