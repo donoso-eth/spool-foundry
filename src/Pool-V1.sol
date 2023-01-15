@@ -113,17 +113,6 @@ contract PoolV1 is
         ops = poolInit.ops;
         gelato = ops.gelato();
 
-        // PRECISSION = 1_000_000;
-        // MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 Day minimum flow == Buffer
-
-        //POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
-        //SUPERFLUID_DEPOSIT = 4 * 3600;
-
-        // DEPOSIT_TRIGGER_AMOUNT = 100 ether;
-        // BALANCE_TRIGGER_TIME = 3600 * 24;
-
-        //PROTOCOL_FEE = 3;
-
         poolStrategy = address(poolInit.poolStrategy);
         poolInternal = poolInit.poolInternal;
 
@@ -297,9 +286,9 @@ contract PoolV1 is
     }
 
     function taskClose(address _supplier) external onlyNotEmergency onlyOps {
-        (uint256 fee, address feeToken) = IOps(ops).getFeeDetails();
+        (uint256 fee, ) = IOps(ops).getFeeDetails();
 
-        transfer(fee, feeToken);
+        transferToGelato(fee);
         callInternal(
             abi.encodeWithSignature("closeStreamFlow(address)", _supplier)
         );
@@ -527,9 +516,9 @@ contract PoolV1 is
             "NOT_CONDITIONS"
         );
 
-        (uint256 fee, address feeToken) = IOps(ops).getFeeDetails();
+        (uint256 fee, ) = IOps(ops).getFeeDetails();
 
-        transfer(fee, feeToken);
+        transferToGelato(fee);
 
         callInternal(abi.encodeWithSignature("_balanceTreasuryFromGelato()"));
     }
@@ -571,17 +560,11 @@ contract PoolV1 is
         }
     }
 
-    function transfer(uint256 _amount, address) internal {
-        // _transfer(_amount, _paymentToken);
-        // callInternal(abi.encodeWithSignature("_transfer(uint256,address)", _amount, _paymentToken));
+    function transferToGelato(uint256 _amount)  internal {
         (bool success, ) = gelato.call{value: _amount}("");
         require(success, "_transfer: ETH transfer failed");
     }
 
-    // function _transfer(uint256 _amount, address _paymentToken) internal {
-    //     (bool success, ) = gelato.call{value: _amount}("");
-    //     require(success, "_transfer: ETH transfer failed");
-    // }
 
     function emitEvents(address _supplier) internal {
         DataTypes.Supplier memory supplier = suppliersByAddress[_supplier];
@@ -864,13 +847,11 @@ contract PoolV1 is
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
 
-        _beforeTokenTransfer(from, to, amount);
-
         require(balanceOf(from) >= amount, "NOT_ENOUGH_BALANCE");
 
         callInternal(
             abi.encodeWithSignature(
-                "transferSTokens(address,address,uint256)",
+                "transferSPTokens(address,address,uint256)",
                 from,
                 to,
                 amount
@@ -878,8 +859,6 @@ contract PoolV1 is
         );
 
         emit Transfer(from, to, amount);
-
-        _afterTokenTransfer(from, to, amount);
 
         bytes memory payload = abi.encode(from, amount);
 
@@ -1085,7 +1064,7 @@ contract PoolV1 is
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
 
-        _beforeTokenTransfer(address(0), account, amount);
+       
 
         _totalSupply += amount;
         unchecked {
@@ -1094,7 +1073,7 @@ contract PoolV1 is
         }
         emit Transfer(address(0), account, amount);
 
-        _afterTokenTransfer(address(0), account, amount);
+  
     }
 
     /**
@@ -1111,7 +1090,7 @@ contract PoolV1 is
     function _burn(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: burn from the zero address");
 
-        _beforeTokenTransfer(account, address(0), amount);
+   
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
@@ -1123,7 +1102,7 @@ contract PoolV1 is
 
         emit Transfer(account, address(0), amount);
 
-        _afterTokenTransfer(account, address(0), amount);
+ 
     }
 
     /**
@@ -1176,45 +1155,8 @@ contract PoolV1 is
         }
     }
 
-    /**
-     * @dev Hook that is called before any transfer of tokens. This includes
-     * minting and burning.
-     *
-     * Calling conditions:
-     *
-     * - when `from` and `to` are both non-zero, `amount` of ``from``'s tokens
-     * will be transferred to `to`.
-     * - when `from` is zero, `amount` tokens will be minted for `to`.
-     * - when `to` is zero, `amount` of ``from``'s tokens will be burned.
-     * - `from` and `to` are never both zero.
-     *
-     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     */
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal {}
 
-    /**
-     * @dev Hook that is called after any transfer of tokens. This includes
-     * minting and burning.
-     *
-     * Calling conditions:
-     *
-     * - when `from` and `to` are both non-zero, `amount` of ``from``'s tokens
-     * has been transferred to `to`.
-     * - when `from` is zero, `amount` tokens have been minted for `to`.
-     * - when `to` is zero, `amount` of ``from``'s tokens have been burned.
-     * - `from` and `to` are never both zero.
-     *
-     * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
-     */
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal {}
+
 
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;

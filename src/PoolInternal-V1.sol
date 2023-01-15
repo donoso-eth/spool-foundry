@@ -62,7 +62,7 @@ contract PoolInternalV1 is PoolStateV1 {
     poolByTimestamp[block.timestamp] = pool;
   }
 
-  function _closeAccount() external onlyPool { }
+  function _closeAccount() external { }
 
   // #endregion User Interaction PoolEvents
 
@@ -362,8 +362,6 @@ contract PoolInternalV1 is PoolStateV1 {
 
     (int256 balance,,,) = superToken.realtimeBalanceOfNow(address(this));
 
-    // if (balance > 0) { } else { }
-    //DataTypes.Pool storage currentPool = poolByTimestamp[lastPoolTimestamp];
 
     uint256 currentThreshold = currentPool.outFlowBuffer;
 
@@ -434,11 +432,7 @@ contract PoolInternalV1 is PoolStateV1 {
       }
 
       if (poolAvailable > withdrawAmount + outFlowBuffer) {
-        console.log(432, poolAvailable);
-        console.log(433, withdrawAmount + outFlowBuffer);
-        console.log(436, superToken.balanceOf(address(this)));
-        console.log(436, superToken.balanceOf(address(this)) - (withdrawAmount + outFlowBuffer));
-        IPoolStrategyV1(poolStrategy).pushToStrategy(poolAvailable - (withdrawAmount + outFlowBuffer));
+       IPoolStrategyV1(poolStrategy).pushToStrategy(poolAvailable - (withdrawAmount + outFlowBuffer));
 
         console.log(436, superToken.balanceOf(address(this)));
 
@@ -490,9 +484,7 @@ contract PoolInternalV1 is PoolStateV1 {
    * @dev  if the outflow does not exist, will be created, if does, will be updted
    */
   function _outStreamHasChanged(DataTypes.Supplier memory supplier, int96 newOutFlow, DataTypes.Pool memory pool) internal returns (DataTypes.Pool memory, DataTypes.Supplier memory) {
-    // DataTypes.Supplier storage supplier = suppliersByAddress[supplier.supplier];
-    // DataTypes.Pool memory pool = poolByTimestamp[block.timestamp];
-
+  
     console.log(496, superToken.balanceOf(address(this)));
 
     uint256 userBalance = _getSupplierBalance(supplier.supplier).div(PRECISSION);
@@ -607,7 +599,7 @@ contract PoolInternalV1 is PoolStateV1 {
   // #endregion  ============= =============  Internal Stream Functions ============= ============= //
 
   // #region  ============= =============  ERC20  ============= ============= //
-  function transferSTokens(address _sender, address _receiver, uint256 amount) external {
+  function transferSPTokens(address _sender, address _receiver, uint256 amount) external {
     _poolUpdate();
     _supplierUpdateCurrentState(_sender);
     DataTypes.Supplier memory sender = _getSupplier(_sender);
