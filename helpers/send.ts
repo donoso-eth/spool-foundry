@@ -33,4 +33,4 @@ export const deploy = async (contract:string) => {
 
 //check();
 
-// anvil --fork-block-number 7850256 -f https://goerli.infura.io/v3/1e43f3d31eea4244bf25ed4c13bfde0e
+// anvil --fork-block-number 8314981 -f https://goerli.infura.io/v3/1e43f3d31eea4244bf25ed4c13bfde0e

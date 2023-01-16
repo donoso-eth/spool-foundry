@@ -32,15 +32,12 @@ abstract contract DecodeFile is Test, Config, Users, Gelato {
     assertEq(block.timestamp, ePool.timestamp, "TIMESTAMP");
     console.log("TIMESTAMP ----> ", block.timestamp, ePool.timestamp);
 
-
-
     (int256 availableBalance,,,) = superToken.realtimeBalanceOfNow(address(poolProxy));
 
     uint256 superTokenBalance = uint256(availableBalance);
 
-    assertEq(superTokenBalance , ePool.poolBalance, "POOL_SUPERTOKEN_BALANCE");
+    assertEq(superTokenBalance, ePool.poolBalance, "POOL_SUPERTOKEN_BALANCE");
     console.log("POOL_SUPERTOKEN_BALANCE ----> ", superTokenBalance, ePool.poolBalance);
- 
 
     uint256 aaveBalance = aToken.balanceOf(address(strategyProxy));
     assertApproxEqRel(aaveBalance, ePool.aaveBalance, 1e12, "AAVE Balance ");
@@ -138,7 +135,6 @@ abstract contract DecodeFile is Test, Config, Users, Gelato {
     if (supplier.outStream.flow > 0 && supplier.timestamp == supplier.outStream.streamInit) {
       bytes32 taskId = gelatoTaskId(user, supplier.outStream.streamInit, supplier.outStream.streamDuration);
       assertEq32(supplier.outStream.cancelWithdrawId, taskId, "TASKID");
-  
     }
 
     assertApproxEqRel(supplier.outStream.streamDuration, eUser.outStepTime, 1e12, "STREAM DURATION");
