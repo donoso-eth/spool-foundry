@@ -13,7 +13,7 @@ import { LibDataTypes } from "../../src/gelato/LibDataTypes.sol";
 abstract contract Gelato is Test, Config {
   using CFAv1Library for CFAv1Library.InitData;
 
-  address opsExecutor = address(0x683913B3A32ada4F8100458A3E1675425BdAa7DF);
+  address opsExecutor = address(0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA);
 
   constructor() { }
 

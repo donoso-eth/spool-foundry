@@ -36,10 +36,16 @@ abstract contract Users is Test, Config {
   }
 
   function faucet(address user) internal {
-    uint256 amount = 1000 ether;
-    token.mint(user, amount);
+    
+    uint256 amount = 10000 ether;
+    uint whale = token.balanceOf(address(0x9810762578aCCF1F314320CCa5B72506aE7D7630));
+
+    vm.prank(address(0x9810762578aCCF1F314320CCa5B72506aE7D7630));
+    token.transfer(user, amount / (1e12));
+  
     vm.startPrank(user);
     token.approve(address(superToken), MAX_INT);
+
     superToken.upgrade(amount);
     vm.stopPrank();
     console.log(user, " ", superToken.balanceOf(user));

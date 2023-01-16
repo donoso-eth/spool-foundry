@@ -18,7 +18,7 @@ import { LibDataTypes } from "./gelato/LibDataTypes.sol";
 import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 import { UUPSProxiable } from "./upgradability/UUPSProxiable.sol";
-import { ERC20mintable } from "./interfaces/ERC20mintable.sol";
+
 
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
@@ -46,24 +46,24 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
 
   ///// IN PRODUCTION WE WILL ONLY REQUIRE the token a ERC20
   ///// NOW WE NEED TO SWAP BETWEEN SUPERFLUID and AAVe FAKE TOKEN
-  ERC20mintable token; // SUPERFLUID Faketoken
-  ERC20mintable aaveToken; // AAVE Fake token
+  IERC20 token; // SUPERFLUID Faketoken
+
 
   uint256 MAX_INT;
 
   constructor() { }
 
-  function initialize(ISuperToken _superToken, ERC20mintable _token, IPoolV1 _pool, IPool _aavePool, IERC20 _aToken, ERC20mintable _aaveToken) external initializer {
+  function initialize(ISuperToken _superToken, IERC20 _token, IPoolV1 _pool, IPool _aavePool, IERC20 _aToken) external initializer {
     owner = msg.sender;
     superToken = _superToken;
     token = _token;
     pool = _pool;
     aavePool = _aavePool;
     aToken = _aToken;
-    aaveToken = _aaveToken;
+    token = _token;
     MAX_INT = 2 ** 256 - 1;
 
-    aaveToken.approve(address(aavePool), MAX_INT);
+    token.approve(address(aavePool), MAX_INT);
     token.approve(address(superToken), MAX_INT);
   }
 
@@ -97,26 +97,24 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   function _deposit(uint256 amountToDeposit) internal {
     superToken.transferFrom(address(pool), address(this), uint256(amountToDeposit));
 
+    console.log(100,amountToDeposit);
+    console.log(101, token.balanceOf(address(this)));
+
     superToken.downgrade(amountToDeposit);
-
-    // COMMENT
-    aaveToken.mint(amountToDeposit / (10 ** 12));
-
-    if (amountToDeposit / (10 ** 12) > 0) {
-      aavePool.supply(address(aaveToken), amountToDeposit / (10 ** 12), address(this), 0);
-    }
+    console.log(102, token.balanceOf(address(this)));
+ 
+  
+      aavePool.supply(address(token), token.balanceOf(address(this)), address(this), 0);
+        console.log(103, token.balanceOf(address(this)));
+        console.log(104, aToken.balanceOf(address(this)));
   }
 
   ////////////// IN PRODUCTIONM REMOVE the 10**12 FACTOR
   function _withdraw(uint256 amount, address _supplier) internal {
     if (amount.div(10 ** 12) > 0) {
-      aavePool.withdraw(address(aaveToken), amount.div(10 ** 12), address(this));
+      aavePool.withdraw(address(token), amount.div(10 ** 12), address(this));
 
       uint256 balanceToken = token.balanceOf(address(this));
-
-      if (balanceToken < amount) {
-        token.mint(address(this), amount - balanceToken);
-      }
 
       superToken.upgrade(amount);
 

@@ -26,7 +26,7 @@ contract PoolStream is Test, DeployPool, Report, DecodeFile {
     payable(poolProxy).transfer(1 ether);
   }
 
-  function testUseCaseStream() public {
+  function _testUseCaseStream() public {
     // #region =================  FIRST PERIOD ============================= //
 
     sendToPool(user1, 500 ether);

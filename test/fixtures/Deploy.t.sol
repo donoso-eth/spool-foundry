@@ -14,7 +14,7 @@ import { PoolInternalV1 } from "../../src/PoolInternal-V1.sol";
 
 import { PoolStrategyV1 } from "../../src/PoolStrategy-V1.sol";
 import { IPoolStrategyV1 } from "../../src/interfaces/IPoolStrategy-V1.sol";
-import { ERC20mintable } from "../../src/interfaces/ERC20mintable.sol";
+
 
 import { SuperPoolFactory } from "../../src/SuperPoolFactory.sol";
 import { UUPSProxy } from "../../src/upgradability/UUPSProxy.sol";
@@ -25,6 +25,7 @@ import { IOps } from "../../src/gelato/IOps.sol";
 
 import { DataTypes } from "../../src/libraries/DataTypes.sol";
 
+import { IGovernance} from "../interfaces/IGovernance.sol";
 import { Config } from "./Config.sol";
 
 abstract contract DeployPool is Test, Config {
@@ -40,7 +41,7 @@ abstract contract DeployPool is Test, Config {
   constructor() { }
 
   function deploy() public {
-    vm.startBroadcast();
+    //vm.startBroadcast();
 
     poolImpl = new PoolV1();
 
@@ -62,17 +63,32 @@ abstract contract DeployPool is Test, Config {
 
     ISuperPoolFactory(address(poolFactoryProxy)).initialize(factoryInitialize);
 
+    address superfluidOwner = address(0x1EB3FAA360bF1f093F5A18d21f21f13D769d044A);
+    
+    address governanceAddress = (0x3AD3f7A0965Ce6f9358AD5CCE86Bc2b05F1EE087);
+
+
+    vm.startPrank(superfluidOwner); 
+    bool isAuthorize = IGovernance(governanceAddress).isAuthorizedAppFactory(address(host), address(poolFactoryProxy));
+    console.log(73, isAuthorize);
+
+    IGovernance(governanceAddress).authorizeAppFactory(address(host), address(poolFactoryProxy));
+
+    isAuthorize = IGovernance(governanceAddress).isAuthorizedAppFactory(address(host), address(poolFactoryProxy));
+    console.log(76, isAuthorize);
+    vm.stopPrank();
+
     ISuperPoolFactory(address(poolFactoryProxy)).createSuperPool(DataTypes.CreatePoolInput(address(superToken), address(strategyProxy)));
 
     poolInfo = ISuperPoolFactory(address(poolFactoryProxy)).getRecordBySuperTokenAddress(address(superToken), address(strategyProxy));
 
     poolProxy = PoolV1(payable(poolInfo.pool));
 
-    IPoolStrategyV1(address(strategyProxy)).initialize(superToken, token, IPoolV1(poolProxy), aavePool, aToken, aaveToken);
+    IPoolStrategyV1(address(strategyProxy)).initialize(superToken, token, IPoolV1(poolProxy), aavePool, aToken);
 
     string memory line1 = string(abi.encodePacked('{"pool":"', vm.toString(address(poolProxy)), '"}'));
     vm.writeFile("./test/addresses.json", line1);
-    vm.stopBroadcast();
+    //vm.stopBroadcast();
 
     vm.warp(block.timestamp + 27 seconds);
   }

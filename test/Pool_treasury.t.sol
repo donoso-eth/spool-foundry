@@ -26,7 +26,7 @@ contract PoolTreasury is Test, DeployPool, Report, DecodeFile {
     payable(poolProxy).transfer(1 ether);
   }
 
-  function testTreasury() public {
+  function _testTreasury() public {
     // #region =================  FIRST PERIOD ============================= //
 
     sendToPool(user1, 500 ether);

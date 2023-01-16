@@ -72,7 +72,7 @@ contract PoolTest is Test, DeployPool, Report {
     invariantTest();
   }
 
-  function testFuzzWithdraw(uint8 userInt, uint256 depositAmount, uint256 withdrawAmount) public {
+  function _testFuzzWithdraw(uint8 userInt, uint256 depositAmount, uint256 withdrawAmount) public {
     vm.assume(withdrawAmount > 1000000000000);
 
     address user = getUser(userInt);

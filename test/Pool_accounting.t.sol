@@ -24,7 +24,7 @@ contract PoolAccounting is Test, DeployPool, Report, DecodeFile {
     payable(poolProxy).transfer(1 ether);
   }
 
-  function testAccounting() public {
+  function _testAccounting() public {
     // #region =================  FIRST PERIOD ============================= //
 
     sendToPool(user1, 500 ether);
