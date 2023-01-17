@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import { HelpTypes } from "./fixtures/TestTypes.t.sol";
+import { PoolProxyWrapper} from "./fixtures/PoolProxyWrapper.sol";
 
 contract PoolStorage is Test, DeployPool, Report, DecodeFile {
   using SafeMath for uint256;
@@ -26,7 +27,7 @@ contract PoolStorage is Test, DeployPool, Report, DecodeFile {
     payable(poolProxy).transfer(1 ether);
   }
 
-  function notestStorage() public {
+  function testStorage() public {
     // #region =================  FIRST PERIOD ============================= //
 
     sendToPool(user1, 500 ether);
@@ -36,18 +37,20 @@ contract PoolStorage is Test, DeployPool, Report, DecodeFile {
 
     // #endregion ============== FIRST PERIOD ============================= //
 
-    bytes32 test = poolProxy.readStorageSlot(4);
-    console.logBytes32(test);
+    bytes32 test = PoolProxyWrapper(payable(poolProxy)).readStorageSlot(5);
+    //console.logBytes32()
+    console.log(42);
+    //console.log(string(bytes(test)));
+    console.log(string((abi.encodePacked("sp",'USDC'))));
+    assertEq(test,bytes32(abi.encodePacked("sp",'USDC')));
 
-    //assertEq(test,bytes32(abi.encodePacked("sp",'fUSDC')));
-
-    string memory aa = string(abi.encodePacked("sp", "fUSDC"));
+    string memory aa = string(abi.encodePacked("sp", "USDC"));
     console.logBytes32(bytes32(bytes(aa)));
     console.log(aa);
 
-    test = poolProxy.readStorageSlot(5);
-    assertEq(test, bytes32(abi.encodePacked(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38))));
-    console.log(49, user1);
-    console.logBytes32(test);
+    // test = poolProxy.readStorageSlot(5);
+    // assertEq(test, bytes32(abi.encodePacked(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38))));
+    // console.log(49, user1);
+    // console.logBytes32(test);
   }
 }

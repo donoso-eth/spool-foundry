@@ -47,7 +47,7 @@ contract PoolInternalV1 is PoolStateV1 {
     pool = _withdrawTreasury(_supplier, _supplier, redeemAmount, pool);
 
     poolByTimestamp[block.timestamp] = pool;
-  }
+  } 
 
   function _redeemFlow(address _supplier, int96 _outFlowRate) external {
     bytes memory placeHolder = "0x";
@@ -167,7 +167,7 @@ contract PoolInternalV1 is PoolStateV1 {
     return supplier;
   }
 
-  function _getSupplierBalance(address _supplier) internal view returns (uint256 realtimeBalance) {
+  function _getSupplierBalance(address _supplier) public view returns (uint256 realtimeBalance) {
     DataTypes.Supplier memory supplier = suppliersByAddress[_supplier];
 
     uint256 yieldSupplier = totalYieldEarnedSupplier(_supplier, IPoolStrategyV1(poolStrategy).balanceOf());

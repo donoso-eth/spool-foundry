@@ -6,7 +6,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol"
 
 import { ISuperfluid, ISuperToken } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 
-import { PoolV1 } from "../../src/Pool-V1.sol";
+//import { PoolV1 } from "../../src/Pool-V1.sol";
 import { IPoolV1 } from "../../src/interfaces/IPool-V1.sol";
 import { ISuperPoolFactory } from "../../src/interfaces/ISuperPoolFactory.sol";
 
@@ -24,12 +24,12 @@ import { IPool } from "../../src/aave/IPool.sol";
 import { IOps } from "../../src/gelato/IOps.sol";
 
 import { DataTypes } from "../../src/libraries/DataTypes.sol";
-
+import { PoolProxyWrapper} from "./PoolProxyWrapper.sol";
 import { IGovernance} from "../interfaces/IGovernance.sol";
 import { Config } from "./Config.sol";
 
 abstract contract DeployPool is Test, Config {
-  PoolV1 poolImpl;
+  PoolProxyWrapper poolImpl;
 
   PoolInternalV1 poolInternal;
 
@@ -43,7 +43,7 @@ abstract contract DeployPool is Test, Config {
   function deploy() public {
     //vm.startBroadcast();
 
-    poolImpl = new PoolV1();
+    poolImpl = new PoolProxyWrapper();
 
     poolInternal = new PoolInternalV1();
 
@@ -82,7 +82,7 @@ abstract contract DeployPool is Test, Config {
 
     poolInfo = ISuperPoolFactory(address(poolFactoryProxy)).getRecordBySuperTokenAddress(address(superToken), address(strategyProxy));
 
-    poolProxy = PoolV1(payable(poolInfo.pool));
+    poolProxy = PoolProxyWrapper(payable(poolInfo.pool));
 
     IPoolStrategyV1(address(strategyProxy)).initialize(superToken, token, IPoolV1(poolProxy), aavePool, aToken);
 

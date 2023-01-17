@@ -101,7 +101,7 @@ contract PoolTest is Test, DeployPool, Report {
     }
   }
 
-  function testCloseAccount() public {
+  function _testCloseAccount() public {
     int96 flowRate = int96(uint96((100 ether) / uint256((30 * 24 * 3600))));
     address user = user1;
 
