@@ -460,14 +460,14 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
 
  function _getSupplierBalance(address _supplier) external  returns(uint256 realtimeBalance) {
-        (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodePacked("_getSupplierBalance(address)",_supplier));
+        (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodeWithSignature("_getSupplierBalance(address)",_supplier));
         require(success, "Failed delegatecall");
         return abi.decode(res, (uint256));
     }
 
   // #region ============ ===============  ERC20 implementation ============= ============= //
   function balanceOf(address _supplier) public view override (IPoolV1, IERC20) returns (uint256 balance) {
-    return IDelegatedPool(address(this))._getSupplierBalance(_supplier);
+    return IDelegatedPool(address(this))._getSupplierBalance(_supplier).div(PRECISSION);
 
   }
 
