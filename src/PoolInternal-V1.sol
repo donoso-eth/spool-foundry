@@ -51,14 +51,7 @@ contract PoolInternalV1 is PoolStateV1 {
 
   function _redeemFlow(address _supplier, int96 _outFlowRate) external {
     bytes memory placeHolder = "0x";
-    console.log(54,superToken.balanceOf(address(this)).div(10 ** 12));
     _updateSupplierFlow(_supplier, 0, _outFlowRate, placeHolder);
-      console.log(56,superToken.balanceOf(address(this)).div(10 ** 12));
-      console.log(57,IPoolStrategyV1(poolStrategy).balanceOf().div(10 ** 12));
-      console.log(superToken.balanceOf(address(this)).div(10 ** 12)+ IPoolStrategyV1(poolStrategy).balanceOf().div(10 ** 12)+35859043);
-
-
-
   }
 
   function _redeemFlowStop(address _supplier) public {
@@ -333,9 +326,9 @@ contract PoolInternalV1 is PoolStateV1 {
         /// PREVIOUS FLOW NOT EXISTENT OR POSITIVE AND CURRENT FLOW NEGATIVE
 
         if (currentNetFlow > 0) {
-          console.log(336,superToken.balanceOf(address(this)));
+          console.log(336, superToken.balanceOf(address(this)));
           _cfaLib.deleteFlow(_supplier, address(this), superToken);
-           console.log(338,superToken.balanceOf(address(this)));
+          console.log(338, superToken.balanceOf(address(this)));
         }
 
         pool.outFlowRate += -newNetFlow;

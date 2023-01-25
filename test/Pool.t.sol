@@ -20,10 +20,13 @@ contract PoolTest is Test, DeployPool, Report {
     payable(poolProxy).transfer(1 ether);
   }
 
-    function testFuzzRedeemFlow() public {
-        int96 flowRate = 9960845554548347;
-  //function testFuzzRedeemFlow(int96 flowRate) public {
   
+
+
+  function testFuzzRedeemFlow() public {
+    int96 flowRate = 9960840000000000;//9960845554548347;
+    //function testFuzzRedeemFlow(int96 flowRate) public {
+
     vm.assume(flowRate > 1000000000000);
     address user = user1;
 
@@ -41,23 +44,21 @@ contract PoolTest is Test, DeployPool, Report {
       redeemFlow(user, flowRate);
 
       vm.warp(block.timestamp + 24 * 3600);
+
       uint256 depo = getFlowDeposit(user, address(poolProxy));
-      console.log(45,depo);
-        invariantTest();
-        console.log(uint96(flowRate)*2 * 24 *3600);
+
+      invariantTest();
+
       redeemFlow(user, flowRate);
-        uint256 depoOut = getFlowDeposit(address(poolProxy),user);
-        console.log(49,depoOut);
-       invariantTest();
+      uint256 depoOut = getFlowDeposit(address(poolProxy), user);
+
+      console.log(29*3600*uint96(flowRate) - depoOut);
+
+      invariantTest();
       depo = getFlowDeposit(user, address(poolProxy));
-      console.log(47,depo);
 
-
-
-     // invariantTest();
+      // invariantTest();
     }
-
- 
   }
 
   function testFuzzStream(uint8 userInt, int96 flowRate) public {

@@ -22,7 +22,7 @@ import { OpsReady } from "./gelato/OpsReady.sol";
 import { IOps } from "./gelato/IOps.sol";
 import { LibDataTypes } from "./gelato/LibDataTypes.sol";
 
-import { IPoolV1,IDelegatedPool } from "./interfaces/IPool-V1.sol";
+import { IPoolV1, IDelegatedPool } from "./interfaces/IPool-V1.sol";
 import { IPoolInternalV1 } from "./interfaces/IPoolInternal-V1.sol";
 import { IPoolStrategyV1 } from "./interfaces/IPoolStrategy-V1.sol";
 import { PoolStateV1 } from "./PoolState-V1.sol";
@@ -99,6 +99,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     balanceTreasuryTask = abi.decode(data, (bytes32)); // createBalanceTreasuryTask();
   }
+
 
   // #region ============ ===============  PUBLIC VIEW FUNCTIONS  ============= ============= //
 
@@ -245,7 +246,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     bytes calldata _ctx
   ) external override onlyExpected(_superToken, _agreementClass) onlyHost onlyNotEmergency returns (bytes memory newCtx) {
     newCtx = _ctx;
-
+    console.log("24---GGGGGGGGGGGUUUAUUAUAUAUUA");
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
@@ -273,6 +274,8 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
     newCtx = _ctx;
 
+    console.log("276---GGGGGGGGGGGUUUAUUAUAUAUUA");
+
     //// If In-Stream we will request a pool update
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, 0, sender);
@@ -299,7 +302,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     bytes calldata _ctx
   ) external override onlyExpected(_superToken, _agreementClass) onlyNotEmergency onlyHost returns (bytes memory newCtx) {
     newCtx = _ctx;
-
+    console.log("305---GGGGGGGGGGGUUUAUUAUAUAUUA");
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
@@ -458,20 +461,16 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     return result;
   }
 
-
- function _getSupplierBalance(address _supplier) external  returns(uint256 realtimeBalance) {
-        (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodeWithSignature("_getSupplierBalance(address)",_supplier));
-        require(success, "Failed delegatecall");
-        return abi.decode(res, (uint256));
-    }
+  function _getSupplierBalance(address _supplier) external returns (uint256 realtimeBalance) {
+    (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodeWithSignature("_getSupplierBalance(address)", _supplier));
+    require(success, "Failed delegatecall");
+    return abi.decode(res, (uint256));
+  }
 
   // #region ============ ===============  ERC20 implementation ============= ============= //
   function balanceOf(address _supplier) public view override (IPoolV1, IERC20) returns (uint256 balance) {
     return IDelegatedPool(address(this))._getSupplierBalance(_supplier).div(PRECISSION);
-
   }
-
-
 
   function _transfer(address from, address to, uint256 amount) internal {
     require(from != address(0), "ERC20: transfer from the zero address");

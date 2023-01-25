@@ -6,7 +6,7 @@ import { ISuperfluid, ISuperToken } from "@superfluid-finance/ethereum-contracts
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 interface IDelegatedPool {
-   function _getSupplierBalance(address _supplier) external view returns(uint256 realtimeBalance);
+  function _getSupplierBalance(address _supplier) external view returns (uint256 realtimeBalance);
 }
 
 interface IPoolV1 {
