@@ -28,25 +28,25 @@ abstract contract Report is Test, Users, Gelato {
   }
 
   function calculateUsersTotalBalance() internal view returns (uint256 usersBalance) {
-    usersBalance = poolProxy.balanceOf(user1).div(10 ** 12) + poolProxy.balanceOf(user2).div(10 ** 12) + poolProxy.balanceOf(user3).div(10 ** 12) + poolProxy.balanceOf(user4).div(10 ** 12);
+    usersBalance = poolProxy.balanceOf(user1) + poolProxy.balanceOf(user2) + poolProxy.balanceOf(user3) + poolProxy.balanceOf(user4);
     DataTypes.Pool memory currentPool = poolProxy.getLastPool();
     console.log(33, usersBalance);
     console.log(currentPool.yieldObject.protocolYield);
-    usersBalance = usersBalance + currentPool.yieldObject.protocolYield.div(10 ** 12);
+    usersBalance = usersBalance + currentPool.yieldObject.protocolYield;
     console.log(34, usersBalance);
   }
 
   function calculatePoolTotalBalance() internal view returns (uint256 poolBalance) {
-    uint256 superTokenBalance = superToken.balanceOf(address(poolProxy)).div(10 ** 12);
+    uint256 superTokenBalance = superToken.balanceOf(address(poolProxy));
     console.log(41,superTokenBalance);
     uint256 aaveBalance = aToken.balanceOf(address(strategyProxy));
      console.log(43,aaveBalance );
-    uint256 depositUser1 = getFlowDeposit(address(poolProxy), user1).div(10 ** 12);
-    uint256 depositUser2 = getFlowDeposit(address(poolProxy), user2).div(10 ** 12);
-    uint256 depositUser3 = getFlowDeposit(address(poolProxy), user3).div(10 ** 12);
-    uint256 depositUser4 = getFlowDeposit(address(poolProxy), user4).div(10 ** 12);
+    uint256 depositUser1 = getFlowDeposit(address(poolProxy), user1);
+    uint256 depositUser2 = getFlowDeposit(address(poolProxy), user2);
+    uint256 depositUser3 = getFlowDeposit(address(poolProxy), user3);
+    uint256 depositUser4 = getFlowDeposit(address(poolProxy), user4);
 
-    console.log(49,depositUser1, depositUser2);
+    console.log(49,depositUser1+ aaveBalance + superTokenBalance, depositUser2);
 
     uint256 deposit = depositUser1 + depositUser2 + depositUser3 + depositUser4;
     poolBalance = superTokenBalance + aaveBalance + deposit;

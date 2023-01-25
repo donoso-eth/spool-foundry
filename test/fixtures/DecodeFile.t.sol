@@ -117,8 +117,10 @@ abstract contract DecodeFile is Test, Config, Users, Gelato {
     DataTypes.Supplier memory supplier = poolProxy.getSupplier(user);
     assertEq(supplier.id, eUser.id, "USER_ID");
     console.log("==============   USER - ", eUser.id, "  ===============");
-
+    console.log(120,user);
+    console.log(121,address(poolProxy));
     uint256 balance = poolProxy.balanceOf(user);
+    console.log(122,balance);
     assertApproxEqRel(balance, eUser.realTimeBalance, 1e12, "REAL_TIME_BALANCE");
     console.log("REAL_TIME_BALANCE ----> ", balance);
 

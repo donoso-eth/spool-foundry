@@ -38,10 +38,13 @@ abstract contract Users is Test, Config {
   function faucet(address user) internal {
     
     uint256 amount = 10000 ether;
-    uint whale = token.balanceOf(address(0x9810762578aCCF1F314320CCa5B72506aE7D7630));
-
-    vm.prank(address(0x9810762578aCCF1F314320CCa5B72506aE7D7630));
-    token.transfer(user, amount / (1e12));
+    uint whale = token.balanceOf(address(0x9810762578aCCF1F314320CCa5B72506aE7D7630)); //USD
+    address whaleDAI = address(0x91993f2101cc758D0dEB7279d41e880F7dEFe827);
+    uint whaleDAIBalance = token.balanceOf(address(whaleDAI)); 
+    console.log(whaleDAIBalance); //16044206230259623513171834
+ 
+    vm.prank(whaleDAI);
+    token.transfer(user, amount);
   
     vm.startPrank(user);
     token.approve(address(superToken), MAX_INT);
@@ -77,7 +80,9 @@ abstract contract Users is Test, Config {
 
   function startFlow(address sender, int96 flowRate) internal {
     vm.startPrank(sender);
+    console.log(93);
     _cfaLib.createFlow(address(poolProxy), superToken, flowRate);
+      console.log(95);
     vm.stopPrank();
   }
 

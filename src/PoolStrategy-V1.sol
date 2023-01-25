@@ -68,7 +68,7 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   }
 
   function balanceOf() public view returns (uint256 balance) {
-    balance = aToken.balanceOf(address(this)) * (10 ** 12);
+    balance = aToken.balanceOf(address(this)) ;
   }
 
   // #region  ============= ============= ONLY POOL FUNCTIONS  ============= ============= //
@@ -85,7 +85,7 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   // #region =========== ================ EMERGENCY =========== ================ //
 
   function withdrawEmergency() external onlyOwner {
-    uint256 balance = aToken.balanceOf(address(this)) * (10 ** 12);
+    uint256 balance = aToken.balanceOf(address(this)) ;
     _withdraw(balance, address(pool));
   }
 
@@ -93,7 +93,6 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
 
   // #region  ============= ============= INTERNAL FUNCTIONS  ============= ============= //
 
-  ////////////// IN PRODUCTIONM REMOVE the 10**12 FACTOR aNR THE MINTING
   function _deposit(uint256 amountToDeposit) internal {
     superToken.transferFrom(address(pool), address(this), uint256(amountToDeposit));
 
@@ -109,10 +108,10 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
         console.log(104, aToken.balanceOf(address(this)));
   }
 
-  ////////////// IN PRODUCTIONM REMOVE the 10**12 FACTOR
+ 
   function _withdraw(uint256 amount, address _supplier) internal {
-    if (amount.div(10 ** 12) > 0) {
-      aavePool.withdraw(address(token), amount.div(10 ** 12), address(this));
+    if (amount > 0) {
+      aavePool.withdraw(address(token), amount, address(this));
 
       uint256 balanceToken = token.balanceOf(address(this));
 

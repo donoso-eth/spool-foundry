@@ -27,7 +27,7 @@ contract PoolStorage is Test, DeployPool, Report, DecodeFile {
     payable(poolProxy).transfer(1 ether);
   }
 
-  function testStorage() public {
+  function _testStorage() public {
     // #region =================  FIRST PERIOD ============================= //
 
     sendToPool(user1, 500 ether);

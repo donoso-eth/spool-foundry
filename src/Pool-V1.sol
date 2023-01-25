@@ -153,12 +153,15 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     require(msg.sender == address(superToken), "INVALID_TOKEN");
     require(amount > 0, "AMOUNT_TO_BE_POSITIVE");
 
+    if(from!= poolStrategy){
+
     callInternal(abi.encodeWithSignature("_tokensReceived(address,uint256)", from, amount));
 
     emitEvents(from);
 
     bytes memory payload = abi.encode(amount);
     emit Events.SupplierEvent(DataTypes.SupplierEvent.DEPOSIT, payload, block.timestamp, from);
+    }
   }
 
   /**
@@ -253,6 +256,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     //// If In-Stream we will request a pool update
 
     if (receiver == address(this)) {
+
       newCtx = _updateStreamRecord(newCtx, inFlowRate, sender);
 
       emitEvents(sender);
@@ -319,6 +323,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   }
 
   function _updateStreamRecord(bytes memory newCtx, int96 inFlowRate, address sender) internal returns (bytes memory updateCtx) {
+
     bytes memory data = callInternal(abi.encodeWithSignature("_updateSupplierFlow(address,int96,int96,bytes)", sender, inFlowRate, 0, newCtx));
 
     updateCtx = abi.decode(data, (bytes));
@@ -460,14 +465,14 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
 
  function _getSupplierBalance(address _supplier) external  returns(uint256 realtimeBalance) {
-        (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodePacked("_getSupplierBalance(address)",_supplier));
+        (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodeWithSignature("_getSupplierBalance(address)",_supplier));
         require(success, "Failed delegatecall");
         return abi.decode(res, (uint256));
     }
 
   // #region ============ ===============  ERC20 implementation ============= ============= //
   function balanceOf(address _supplier) public view override (IPoolV1, IERC20) returns (uint256 balance) {
-    return IDelegatedPool(address(this))._getSupplierBalance(_supplier);
+    return IDelegatedPool(address(this))._getSupplierBalance(_supplier).div(PRECISSION);
 
   }
 

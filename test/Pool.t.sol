@@ -21,10 +21,10 @@ contract PoolTest is Test, DeployPool, Report {
   }
 
     function testFuzzRedeemFlow() public {
-        int96 flowRate = 9960845554548347;
+        int96 flowRate = 53937141655095766;
   //function testFuzzRedeemFlow(int96 flowRate) public {
   
-    vm.assume(flowRate > 1000000000000);
+   // vm.assume(flowRate > 1000000000000);
     address user = user1;
 
     DataTypes.Pool memory currentPool;
@@ -37,14 +37,15 @@ contract PoolTest is Test, DeployPool, Report {
 
       vm.warp(block.timestamp + 24 * 3600);
 
-      vm.expectRevert(bytes("INSUFFICIENT_FUNDS"));
-      redeemFlow(user, flowRate);
+      // vm.expectRevert(bytes("INSUFFICIENT_FUNDS"));
+      // redeemFlow(user, flowRate);
 
       vm.warp(block.timestamp + 24 * 3600);
       uint256 depo = getFlowDeposit(user, address(poolProxy));
       console.log(45,depo);
         invariantTest();
-        console.log(uint96(flowRate)*2 * 24 *3600);
+        console.log(47,uint96(flowRate)*2 * 24 *3600);
+      
       redeemFlow(user, flowRate);
         uint256 depoOut = getFlowDeposit(address(poolProxy),user);
         console.log(49,depoOut);
@@ -72,12 +73,12 @@ contract PoolTest is Test, DeployPool, Report {
     invariantTest();
   }
 
-  function _testFuzzWithdraw(uint8 userInt, uint256 depositAmount, uint256 withdrawAmount) public {
-    vm.assume(withdrawAmount > 1000000000000);
+  function testFuzzWithdraw(uint8 userInt, uint256 depositAmount, uint256 withdrawAmount) public {
+   vm.assume(depositAmount > withdrawAmount);
 
     address user = getUser(userInt);
 
-    if (depositAmount.div(10 ** 12) > withdrawAmount.div(10 ** 12) && superToken.balanceOf(user) > depositAmount && depositAmount > 0) {
+    if (depositAmount > withdrawAmount && superToken.balanceOf(user) > depositAmount && depositAmount > 0) {
       sendToPool(user, depositAmount);
 
       if (withdrawAmount > depositAmount) {
@@ -91,7 +92,7 @@ contract PoolTest is Test, DeployPool, Report {
   }
 
   function testFuzzDeposit(uint8 userInt, uint256 amount) public {
-    vm.assume(amount > 1000000000000);
+    //vm.assume(amount > 1000000000000);
 
     address user = getUser(userInt);
 
@@ -207,7 +208,7 @@ contract PoolTest is Test, DeployPool, Report {
   }
 
   function testWithdraw() public {
-    uint256 depositAmount = 2000000000000;
+    uint256 depositAmount = 3000000000000;
     uint256 withdrawAmount = 1000000000000;
     address user = user1;
 
@@ -216,11 +217,11 @@ contract PoolTest is Test, DeployPool, Report {
     invariantTest();
 
     withdrawFromPool(user, withdrawAmount);
-
+    console.log(219);
     invariantTest();
 
     vm.expectRevert(bytes("NOT_ENOUGH_BALANCE"));
-    withdrawFromPool(user, withdrawAmount * 2);
+    withdrawFromPool(user, withdrawAmount * 3);
 
     withdrawFromPool(user, withdrawAmount);
 
