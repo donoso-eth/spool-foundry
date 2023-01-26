@@ -16,7 +16,6 @@ import { PoolInternalV1 } from "../src/PoolInternal-V1.sol";
 import { PoolStrategyV1 } from "../src/PoolStrategy-V1.sol";
 import { IPoolStrategyV1 } from "../src/interfaces/IPoolStrategy-V1.sol";
 
-
 import { SuperPoolFactory } from "../src/SuperPoolFactory.sol";
 import { UUPSProxy } from "../src/upgradability/UUPSProxy.sol";
 
@@ -27,7 +26,7 @@ import { IOps } from "../src/gelato/IOps.sol";
 import { DataTypes } from "../src/libraries/DataTypes.sol";
 
 contract DeployScript is Script {
- ISuperfluid host = ISuperfluid(0x3E14dC1b13c488a8d5D310918780c983bD5982E7);
+  ISuperfluid host = ISuperfluid(0x3E14dC1b13c488a8d5D310918780c983bD5982E7);
   ISuperToken superToken = ISuperToken(0xCAa7349CEA390F89641fe306D93591f87595dc1F);
   IOps ops = IOps(0x527a819db1eb0e34426297b03bae11F2f8B3A19E);
 

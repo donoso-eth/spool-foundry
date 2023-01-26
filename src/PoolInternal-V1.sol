@@ -373,6 +373,8 @@ contract PoolInternalV1 is PoolStateV1 {
   function _balanceTreasury(DataTypes.Pool memory currentPool) public returns (DataTypes.Pool memory) {
     lastExecution = block.timestamp;
 
+    console.log(376);
+
     (int256 balance,,,) = superToken.realtimeBalanceOfNow(address(this));
 
     uint256 currentThreshold = currentPool.outFlowBuffer;
@@ -417,6 +419,7 @@ contract PoolInternalV1 is PoolStateV1 {
    */
   function _withdrawTreasury(address _supplier, address _receiver, uint256 withdrawAmount, DataTypes.Pool memory pool) internal returns (DataTypes.Pool memory) {
     lastExecution = block.timestamp;
+    console.log(422);
     // DataTypes.Pool storage pool = poolByTimestamp[block.timestamp];
 
     uint256 currentThreshold = pool.outFlowBuffer;
@@ -433,6 +436,10 @@ contract PoolInternalV1 is PoolStateV1 {
     if (superToken.balanceOf(address(this)) > (currentThreshold)) {
       poolAvailable = superToken.balanceOf(address(this)) - (currentThreshold);
     }
+
+    console.log(440, poolAvailable);
+    console.log(441, superToken.balanceOf(address(this)));
+    console.log(442, currentThreshold);
 
     //// if enough in the pool is available then not go to the pool strategy
     if (poolAvailable >= withdrawAmount + outFlowBuffer) {

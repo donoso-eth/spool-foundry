@@ -19,7 +19,6 @@ import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 import { UUPSProxiable } from "./upgradability/UUPSProxiable.sol";
 
-
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 /**
@@ -48,7 +47,6 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   ///// NOW WE NEED TO SWAP BETWEEN SUPERFLUID and AAVe FAKE TOKEN
   IERC20 token; // SUPERFLUID Faketoken
 
-
   uint256 MAX_INT;
 
   constructor() { }
@@ -68,7 +66,7 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   }
 
   function balanceOf() public view returns (uint256 balance) {
-    balance = aToken.balanceOf(address(this)) ;
+    balance = aToken.balanceOf(address(this));
   }
 
   // #region  ============= ============= ONLY POOL FUNCTIONS  ============= ============= //
@@ -85,7 +83,7 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   // #region =========== ================ EMERGENCY =========== ================ //
 
   function withdrawEmergency() external onlyOwner {
-    uint256 balance = aToken.balanceOf(address(this)) ;
+    uint256 balance = aToken.balanceOf(address(this));
     _withdraw(balance, address(pool));
   }
 
@@ -96,25 +94,26 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
   function _deposit(uint256 amountToDeposit) internal {
     superToken.transferFrom(address(pool), address(this), uint256(amountToDeposit));
 
-    console.log(100,amountToDeposit);
+    console.log(100, amountToDeposit);
     console.log(101, token.balanceOf(address(this)));
 
     superToken.downgrade(amountToDeposit);
     console.log(102, token.balanceOf(address(this)));
- 
-  
-      aavePool.supply(address(token), token.balanceOf(address(this)), address(this), 0);
-        console.log(103, token.balanceOf(address(this)));
-        console.log(104, aToken.balanceOf(address(this)));
+
+    aavePool.supply(address(token), token.balanceOf(address(this)), address(this), 0);
+    console.log(103, token.balanceOf(address(this)));
+    console.log(104, aToken.balanceOf(address(this)));
   }
 
- 
   function _withdraw(uint256 amount, address _supplier) internal {
     if (amount > 0) {
       aavePool.withdraw(address(token), amount, address(this));
 
-      uint256 balanceToken = token.balanceOf(address(this));
+      console.log(116, amount);
 
+      uint256 balanceToken = token.balanceOf(address(this));
+      console.log(119, token.balanceOf(address(this)));
+      console.log(120, aToken.balanceOf(address(this)));
       superToken.upgrade(amount);
 
       IERC20(address(superToken)).transfer(_supplier, amount);

@@ -22,7 +22,7 @@ import { OpsReady } from "./gelato/OpsReady.sol";
 import { IOps } from "./gelato/IOps.sol";
 import { LibDataTypes } from "./gelato/LibDataTypes.sol";
 
-import { IPoolV1,IDelegatedPool } from "./interfaces/IPool-V1.sol";
+import { IPoolV1, IDelegatedPool } from "./interfaces/IPool-V1.sol";
 import { IPoolInternalV1 } from "./interfaces/IPoolInternal-V1.sol";
 import { IPoolStrategyV1 } from "./interfaces/IPoolStrategy-V1.sol";
 import { PoolStateV1 } from "./PoolState-V1.sol";
@@ -153,14 +153,13 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     require(msg.sender == address(superToken), "INVALID_TOKEN");
     require(amount > 0, "AMOUNT_TO_BE_POSITIVE");
 
-    if(from!= poolStrategy){
+    if (from != poolStrategy) {
+      callInternal(abi.encodeWithSignature("_tokensReceived(address,uint256)", from, amount));
 
-    callInternal(abi.encodeWithSignature("_tokensReceived(address,uint256)", from, amount));
+      emitEvents(from);
 
-    emitEvents(from);
-
-    bytes memory payload = abi.encode(amount);
-    emit Events.SupplierEvent(DataTypes.SupplierEvent.DEPOSIT, payload, block.timestamp, from);
+      bytes memory payload = abi.encode(amount);
+      emit Events.SupplierEvent(DataTypes.SupplierEvent.DEPOSIT, payload, block.timestamp, from);
     }
   }
 
@@ -256,7 +255,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     //// If In-Stream we will request a pool update
 
     if (receiver == address(this)) {
-
       newCtx = _updateStreamRecord(newCtx, inFlowRate, sender);
 
       emitEvents(sender);
@@ -323,7 +321,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   }
 
   function _updateStreamRecord(bytes memory newCtx, int96 inFlowRate, address sender) internal returns (bytes memory updateCtx) {
-
     bytes memory data = callInternal(abi.encodeWithSignature("_updateSupplierFlow(address,int96,int96,bytes)", sender, inFlowRate, 0, newCtx));
 
     updateCtx = abi.decode(data, (bytes));
@@ -448,34 +445,22 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   }
 
   modifier onlyNotEmergency() {
-    require(emergency == false, "PAUSED");
+    require(emergency == false, "EMERGENCY");
     _;
   }
 
   // #endregion =========== =============  Modifiers ============= ============= //
 
-  receive() external payable {
-    console.log("----- receive:", msg.value);
-  }
-
-  function withdraw() external onlyOwner returns (bool) {
-    (bool result,) = payable(msg.sender).call{value: address(this).balance}("");
-    return result;
-  }
-
-
- function _getSupplierBalance(address _supplier) external  returns(uint256 realtimeBalance) {
-        (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodeWithSignature("_getSupplierBalance(address)",_supplier));
-        require(success, "Failed delegatecall");
-        return abi.decode(res, (uint256));
-    }
-
   // #region ============ ===============  ERC20 implementation ============= ============= //
   function balanceOf(address _supplier) public view override (IPoolV1, IERC20) returns (uint256 balance) {
     return IDelegatedPool(address(this))._getSupplierBalance(_supplier).div(PRECISSION);
-
   }
 
+  function _getSupplierBalance(address _supplier) external returns (uint256 realtimeBalance) {
+    (bool success, bytes memory res) = poolInternal.delegatecall(abi.encodeWithSignature("_getSupplierBalance(address)", _supplier));
+    require(success, "Failed delegatecall");
+    return abi.decode(res, (uint256));
+  }
 
   function _transfer(address from, address to, uint256 amount) internal {
     require(from != address(0), "ERC20: transfer from the zero address");
@@ -738,26 +723,28 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     emergency = _emergency;
   }
 
-  function emergencyCloseStream(address[] memory sender, address[] memory receiver) external onlyOwner {
+  function emergencyCloseStream(address[] calldata senders, address[] memory receivers) external onlyOwner {
+    require(emergency == true, "NOT_EMERGENCY");
     if (emergency) {
-      for (uint256 i = 0; i < sender.length; i++) {
-        _cfaLib.deleteFlow(sender[i], receiver[i], superToken);
-        if (sender[i] == address(this)) {
-          bytes32 taskId = suppliersByAddress[receiver[i]].outStream.cancelWithdrawId;
+      for (uint256 i = 0; i < senders.length; i++) {
+        _cfaLib.deleteFlow(senders[i], receivers[i], superToken);
+        if (senders[i] == address(this)) {
+          bytes32 taskId = suppliersByAddress[receivers[i]].outStream.cancelWithdrawId;
           ops.cancelTask(taskId);
-          suppliersByAddress[receiver[i]].outStream = DataTypes.OutStream(0, 0, 0, 0);
+          suppliersByAddress[receivers[i]].outStream = DataTypes.OutStream(0, 0, 0, 0);
         } else {
-          suppliersByAddress[sender[i]].inStream = 0;
+          suppliersByAddress[senders[i]].inStream = 0;
         }
       }
     }
   }
 
   function emergencyUpdateBalanceSuppplier(address[] memory suppliers, uint256[] memory balances) external onlyOwner {
+    require(emergency == true, "NOT_EMERGENCY");
     if (emergency) {
       for (uint256 i = 0; i < suppliers.length; i++) {
         DataTypes.Supplier storage supplier = suppliersByAddress[suppliers[i]];
-        supplier.deposit = balances[i];
+        supplier.deposit = balances[i] * PRECISSION;
         supplier.timestamp = block.timestamp;
       }
     }
@@ -765,5 +752,12 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
   // #endregion =========== ================ EMERGENCY =========== ================ //
 
+  receive() external payable {
+    console.log("----- receive:", msg.value);
+  }
 
+  function withdraw() external onlyOwner returns (bool) {
+    (bool result,) = payable(msg.sender).call{value: address(this).balance}("");
+    return result;
+  }
 }

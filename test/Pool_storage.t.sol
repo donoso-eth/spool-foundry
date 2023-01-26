@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import { HelpTypes } from "./fixtures/TestTypes.t.sol";
-import { PoolProxyWrapper} from "./fixtures/PoolProxyWrapper.sol";
+import { PoolProxyWrapper } from "./fixtures/PoolProxyWrapper.sol";
 
 contract PoolStorage is Test, DeployPool, Report, DecodeFile {
   using SafeMath for uint256;
@@ -41,8 +41,8 @@ contract PoolStorage is Test, DeployPool, Report, DecodeFile {
     //console.logBytes32()
     console.log(42);
     //console.log(string(bytes(test)));
-    console.log(string((abi.encodePacked("sp",'USDC'))));
-    assertEq(test,bytes32(abi.encodePacked("sp",'USDC')));
+    console.log(string((abi.encodePacked("sp", "USDC"))));
+    assertEq(test, bytes32(abi.encodePacked("sp", "USDC")));
 
     string memory aa = string(abi.encodePacked("sp", "USDC"));
     console.logBytes32(bytes32(bytes(aa)));

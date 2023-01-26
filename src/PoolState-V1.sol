@@ -15,7 +15,7 @@ import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 
 contract PoolStateV1 {
-  bool emergency = false;
+  bool public emergency = false;
 
   //ERC20
 
@@ -30,7 +30,7 @@ contract PoolStateV1 {
 
   // #region pool state
 
-  address owner;
+  address public owner;
   address poolFactory;
 
   uint256 lastPoolTimestamp;

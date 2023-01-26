@@ -20,45 +20,43 @@ contract PoolTest is Test, DeployPool, Report {
     payable(poolProxy).transfer(1 ether);
   }
 
-    function testFuzzRedeemFlow() public {
-        int96 flowRate = 53937141655095766;
-  //function testFuzzRedeemFlow(int96 flowRate) public {
-  
-   // vm.assume(flowRate > 1000000000000);
-    address user = user1;
+  // function testFuzzRedeemFlow() public {
+  //     int96 flowRate = 53937141655095766; // equals = 139805 token month
+  function testFuzzRedeemFlow(int96 flowRate) public {
+    if (flowRate > 45000) {
+      vm.assume(flowRate > 45000);
+      vm.assume(flowRate < 53937141655095766);
+      address user = user1;
 
-    DataTypes.Pool memory currentPool;
+      DataTypes.Pool memory currentPool;
 
-    vm.expectRevert(bytes("NO_BALANCE"));
-    redeemFlow(user, flowRate);
-
-    if (superToken.balanceOf(user) > uint256(uint96(flowRate)) * 4 * 60 * 60) {
-      startFlow(user, flowRate);
-
-      vm.warp(block.timestamp + 24 * 3600);
-
-      // vm.expectRevert(bytes("INSUFFICIENT_FUNDS"));
-      // redeemFlow(user, flowRate);
-
-      vm.warp(block.timestamp + 24 * 3600);
-      uint256 depo = getFlowDeposit(user, address(poolProxy));
-      console.log(45,depo);
-        invariantTest();
-        console.log(47,uint96(flowRate)*2 * 24 *3600);
-      
+      vm.expectRevert(bytes("NO_BALANCE"));
       redeemFlow(user, flowRate);
-        uint256 depoOut = getFlowDeposit(address(poolProxy),user);
-        console.log(49,depoOut);
-       invariantTest();
-      depo = getFlowDeposit(user, address(poolProxy));
-      console.log(47,depo);
 
+      if (superToken.balanceOf(user) > uint256(uint96(flowRate)) * 4 * 60 * 60) {
+        startFlow(user, flowRate);
 
+        vm.warp(block.timestamp + 24 * 3600);
 
-     // invariantTest();
+        vm.expectRevert(bytes("INSUFFICIENT_FUNDS"));
+        redeemFlow(user, flowRate);
+
+        vm.warp(block.timestamp + 24 * 3600);
+        uint256 depo = getFlowDeposit(user, address(poolProxy));
+        console.log(45, depo);
+        invariantTest();
+        console.log(47, uint96(flowRate) * 2 * 24 * 3600);
+
+        redeemFlow(user, flowRate);
+        uint256 depoOut = getFlowDeposit(address(poolProxy), user);
+        console.log(49, depoOut);
+        invariantTest();
+        depo = getFlowDeposit(user, address(poolProxy));
+        console.log(47, depo);
+
+        // invariantTest();
+      }
     }
-
- 
   }
 
   function testFuzzStream(uint8 userInt, int96 flowRate) public {
@@ -74,7 +72,7 @@ contract PoolTest is Test, DeployPool, Report {
   }
 
   function testFuzzWithdraw(uint8 userInt, uint256 depositAmount, uint256 withdrawAmount) public {
-   vm.assume(depositAmount > withdrawAmount);
+    vm.assume(depositAmount > withdrawAmount);
 
     address user = getUser(userInt);
 
@@ -102,7 +100,7 @@ contract PoolTest is Test, DeployPool, Report {
     }
   }
 
-  function _testCloseAccount() public {
+  function testCloseAccount() public {
     int96 flowRate = int96(uint96((100 ether) / uint256((30 * 24 * 3600))));
     address user = user1;
 
@@ -114,14 +112,14 @@ contract PoolTest is Test, DeployPool, Report {
 
     initBalance = calculatePoolTotalBalance();
     invariantTest();
-    assertApproxEqRel(100 ether / 1e12, initBalance, 1e12, "CLOSE_ACCOUNT_BALANCE-1");
+    assertApproxEqRel(100 ether, initBalance, 1e12, "CLOSE_ACCOUNT_BALANCE-1");
     console.log("CLOSE_ACCOUNT_BALANCE ----> ", initBalance);
 
     uint256 amount = 50 ether;
     sendToPool(user, amount);
     initBalance = calculatePoolTotalBalance();
     invariantTest();
-    assertApproxEqRel(150 ether / 1e12, initBalance, 1e12, "CLOSE_ACCOUNT_BALANCE-2");
+    assertApproxEqRel(150 ether, initBalance, 1e12, "CLOSE_ACCOUNT_BALANCE-2");
     console.log("CLOSE_ACCOUNT_BALANCE ----> ", initBalance);
 
     vm.warp(block.timestamp + 30 * 24 * 3600);
@@ -167,6 +165,69 @@ contract PoolTest is Test, DeployPool, Report {
     currentPool = poolProxy.getLastPool();
 
     assertEq(currentPool.outFlowRate, 0, "FLOW_SHOUL_BE_ZERO");
+  }
+
+  function testEmergency() public {
+    bool emergency = poolProxy.emergency();
+
+    assertEq(emergency, false);
+    address owner = poolProxy.owner();
+
+    startFlow(user1, 10000000000);
+
+    sendToPool(user2, 50 ether);
+
+    vm.warp(block.timestamp + 30 * 24 * 3600);
+
+    redeemFlow(user2, 5000000000);
+
+    vm.startPrank(user2);
+
+    vm.expectRevert(bytes("Only Owner"));
+    poolProxy.setEmergency(true);
+    vm.stopPrank();
+
+    vm.startPrank(owner);
+    poolProxy.setEmergency(true);
+    emergency = poolProxy.emergency();
+    assertEq(emergency, true);
+    vm.stopPrank();
+
+    vm.expectRevert(bytes("EMERGENCY"));
+    withdrawFromPool(user2, 10 ether);
+
+    vm.startPrank(owner);
+    address[] memory senders = new address[](2);
+    senders[0] = user1;
+    senders[1] = address(poolProxy);
+
+    address[] memory receivers = new address[](2);
+    receivers[0] = address(poolProxy);
+    receivers[1] = user2;
+
+    poolProxy.emergencyCloseStream(senders, receivers);
+
+    int96 flowRate = getFlowRate(user1, address(poolProxy));
+
+    assertEq(flowRate, 0);
+
+    int96 outFlowRate = getFlowRate(address(poolProxy), user2);
+
+    assertEq(outFlowRate, 0);
+
+    address[] memory suppliers = new address[](1);
+    suppliers[0] = user2;
+
+    uint256[] memory balances = new uint256[](1);
+    balances[0] = 3 ether;
+
+    poolProxy.emergencyUpdateBalanceSuppplier(suppliers, balances);
+
+    uint256 user2Balance = poolProxy.balanceOf(user2);
+
+    assertEq(user2Balance, 3 ether);
+
+    vm.stopPrank();
   }
 
   function testRedeemFlow() public {

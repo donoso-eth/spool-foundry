@@ -9,7 +9,6 @@ import { ISuperfluid, ISuperToken } from "@superfluid-finance/ethereum-contracts
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-
 import { IPool } from "../../src/aave/IPool.sol";
 import { DataTypes } from "../../src/libraries/DataTypes.sol";
 
@@ -38,15 +37,15 @@ abstract contract Report is Test, Users, Gelato {
 
   function calculatePoolTotalBalance() internal view returns (uint256 poolBalance) {
     uint256 superTokenBalance = superToken.balanceOf(address(poolProxy));
-    console.log(41,superTokenBalance);
+    console.log(41, superTokenBalance);
     uint256 aaveBalance = aToken.balanceOf(address(strategyProxy));
-     console.log(43,aaveBalance );
+    console.log(43, aaveBalance);
     uint256 depositUser1 = getFlowDeposit(address(poolProxy), user1);
     uint256 depositUser2 = getFlowDeposit(address(poolProxy), user2);
     uint256 depositUser3 = getFlowDeposit(address(poolProxy), user3);
     uint256 depositUser4 = getFlowDeposit(address(poolProxy), user4);
 
-    console.log(49,depositUser1+ aaveBalance + superTokenBalance, depositUser2);
+    console.log(49, depositUser1 + aaveBalance + superTokenBalance, depositUser2);
 
     uint256 deposit = depositUser1 + depositUser2 + depositUser3 + depositUser4;
     poolBalance = superTokenBalance + aaveBalance + deposit;

@@ -15,7 +15,6 @@ import { PoolInternalV1 } from "../../src/PoolInternal-V1.sol";
 import { PoolStrategyV1 } from "../../src/PoolStrategy-V1.sol";
 import { IPoolStrategyV1 } from "../../src/interfaces/IPoolStrategy-V1.sol";
 
-
 import { SuperPoolFactory } from "../../src/SuperPoolFactory.sol";
 import { UUPSProxy } from "../../src/upgradability/UUPSProxy.sol";
 
@@ -24,8 +23,8 @@ import { IPool } from "../../src/aave/IPool.sol";
 import { IOps } from "../../src/gelato/IOps.sol";
 
 import { DataTypes } from "../../src/libraries/DataTypes.sol";
-import { PoolProxyWrapper} from "./PoolProxyWrapper.sol";
-import { IGovernance} from "../interfaces/IGovernance.sol";
+import { PoolProxyWrapper } from "./PoolProxyWrapper.sol";
+import { IGovernance } from "../interfaces/IGovernance.sol";
 import { Config } from "./Config.sol";
 
 abstract contract DeployPool is Test, Config {
@@ -64,11 +63,10 @@ abstract contract DeployPool is Test, Config {
     ISuperPoolFactory(address(poolFactoryProxy)).initialize(factoryInitialize);
 
     address superfluidOwner = address(0x1EB3FAA360bF1f093F5A18d21f21f13D769d044A);
-    
+
     address governanceAddress = (0x3AD3f7A0965Ce6f9358AD5CCE86Bc2b05F1EE087);
 
-
-    vm.startPrank(superfluidOwner); 
+    vm.startPrank(superfluidOwner);
     bool isAuthorize = IGovernance(governanceAddress).isAuthorizedAppFactory(address(host), address(poolFactoryProxy));
     console.log(73, isAuthorize);
 

@@ -29,7 +29,6 @@ abstract contract Config {
   // IERC20 aToken = IERC20(0x625E7708f30cA75bfd92586e17077590C60eb4cD);
 
   IPool aavePool = IPool(0x794a61358D6845594F94dc1DB02A252b5b4814aD);
-  
 
   DataTypes.PoolInfo poolInfo;
   PoolV1 poolProxy;
