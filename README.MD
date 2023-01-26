@@ -20,7 +20,8 @@ In the same way, a user can redeem a flow of  “spTokens” in this case, the u
 
 ## Contract Structure
 
-Contracts can be found at: [contracts](https://github.com/donoso-eth/spool-foundry/tree/main/src)
+GOERLI data
+<!-- Contracts can be found at: [contracts](https://github.com/donoso-eth/spool-foundry/tree/main/src)
 
 The  major proxy contracts are verified and can be found at
 
@@ -34,7 +35,7 @@ Yield Strategy (aave)
 [PoolStrategy](https://goerli.etherscan.io/address/0x38B33A2052Cd7E6072b50E9d2b76D1eC52E5f4fC)
 
 PoolFactory (create a pool passing superToken and strategy)
-[PoolFactory](https://goerli.etherscan.io/address/0xE8e2A6DBE6Cc0A746855Acff8ceEDfbf18FC8499)
+[PoolFactory](https://goerli.etherscan.io/address/0xE8e2A6DBE6Cc0A746855Acff8ceEDfbf18FC8499) -->
 
 
 ###  Super Pool Factory
