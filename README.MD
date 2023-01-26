@@ -1,5 +1,6 @@
 # Super Pool
 
+Demo app on Goerli live at [https://super-pool-6991a.web.app](https://super-pool-6991a.web.app)
 
 ## Description
 
