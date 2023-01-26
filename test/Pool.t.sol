@@ -20,12 +20,12 @@ contract PoolTest is Test, DeployPool, Report {
     payable(poolProxy).transfer(1 ether);
   }
 
-  // function testFuzzRedeemFlow() public {
+  //  function testFuzzRedeemFlow() public {
   //     int96 flowRate = 53937141655095766; // equals = 139805 token month
   function testFuzzRedeemFlow(int96 flowRate) public {
     if (flowRate > 45000) {
-      vm.assume(flowRate > 45000);
-      vm.assume(flowRate < 53937141655095766);
+       vm.assume(flowRate > 45000);
+      // vm.assume(flowRate < 53937141655095766);
       address user = user1;
 
       DataTypes.Pool memory currentPool;
