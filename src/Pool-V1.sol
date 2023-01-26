@@ -57,10 +57,11 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
    * @notice initializer of the Pool
    */
   function initialize(DataTypes.PoolInitializer memory poolInit) external initializer {
-    ///initialState
 
+    //// ERC
     _name = poolInit.name;
     _symbol = poolInit.symbol;
+
     //// super app && superfluid
     host = poolInit.host;
     owner = poolInit.owner;
@@ -71,11 +72,10 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     owner = poolInit.owner;
     poolFactory = msg.sender;
 
-    //MAX_INT = 2 ** 256 - 1;
 
     _cfaLib = CFAv1Library.InitData(host, cfa);
 
-    //// tokens receie implementation
+    //// tokens receive implementation
     IERC1820Registry _erc1820 = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
     bytes32 TOKENS_RECIPIENT_INTERFACE_HASH = keccak256("ERC777TokensRecipient");
 
@@ -95,6 +95,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     lastPoolTimestamp = block.timestamp;
     poolByTimestamp[block.timestamp].timestamp = block.timestamp;
 
+    // create Balance Task
     bytes memory data = callInternal(abi.encodeWithSignature("_createBalanceTreasuryTask()"));
 
     balanceTreasuryTask = abi.decode(data, (bytes32)); // createBalanceTreasuryTask();
@@ -139,7 +140,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
    *
    * ---- redeemFlowStop() User stops receiving stream from the pool
    *
-   * ---- closeAcount User receives the complete balance and streams will be closed //TODO
+   * ---- closeAcount User receives the complete balance and streams will be closed
    *
    *
    */
@@ -247,12 +248,11 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     bytes calldata _ctx
   ) external override onlyExpected(_superToken, _agreementClass) onlyHost onlyNotEmergency returns (bytes memory newCtx) {
     newCtx = _ctx;
-
+     console.log(25555555555555);
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
 
-    //// If In-Stream we will request a pool update
 
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, inFlowRate, sender);
@@ -274,14 +274,15 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   ) external override returns (bytes memory newCtx) {
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
     newCtx = _ctx;
-
-    //// If In-Stream we will request a pool update
+    console.log(277777777);
+  
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, 0, sender);
       emitEvents(sender);
       bytes memory payload = abi.encode("");
       emit Events.SupplierEvent(DataTypes.SupplierEvent.STREAM_STOP, payload, block.timestamp, sender);
     } else if (sender == address(this)) {
+      
       callInternal(abi.encodeWithSignature("_redeemFlowStop(address)", receiver));
 
       emitEvents(receiver);
@@ -306,7 +307,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
 
-    // If In-Stream we will request a pool update
+ 
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, inFlowRate, sender);
 
@@ -373,6 +374,8 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     if (!success) {
       if (data.length < 68) revert();
+
+      //  We use assembly for bubbling up the revert message if delegateCall is not Successful
       assembly {
         data := add(data, 0x04)
       }

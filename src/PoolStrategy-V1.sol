@@ -37,15 +37,14 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
 
   address owner;
 
-  ISuperToken superToken;
-  IPoolV1 pool;
-  /// Pool
-  IPool aavePool; //// aave Pool to deposit
-  IERC20 aToken; //// aToken received
 
-  ///// IN PRODUCTION WE WILL ONLY REQUIRE the token a ERC20
-  ///// NOW WE NEED TO SWAP BETWEEN SUPERFLUID and AAVe FAKE TOKEN
-  IERC20 token; // SUPERFLUID Faketoken
+  IPoolV1 pool;   ///SuperPool Pool
+
+  IPool aavePool; //// aave Pool to deposit
+
+  ISuperToken superToken; //superToken
+  IERC20 aToken; //// aToken received
+  IERC20 token; // token
 
   uint256 MAX_INT;
 
@@ -61,7 +60,10 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
     token = _token;
     MAX_INT = 2 ** 256 - 1;
 
+    /// we approve aave to deposit the tokens
     token.approve(address(aavePool), MAX_INT);
+
+    /// we approve the supertoken to upgrade/downgrade
     token.approve(address(superToken), MAX_INT);
   }
 

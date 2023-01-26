@@ -249,6 +249,9 @@ contract PoolTest is Test, DeployPool, Report {
     vm.warp(block.timestamp + 24 * 3600);
     initBalance = calculatePoolTotalBalance();
 
+    vm.expectRevert(bytes("FLOWRATE_SHOULD_BE_GREATER_THAN_ZERO"));
+    redeemFlow(user, 0);
+
     redeemFlow(user, flowRate);
 
     invariantTest();
