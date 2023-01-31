@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import { ISuperToken, ISuperfluid } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
-import { CFAv1Library } from "@superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
+import { SuperTokenV1Library } from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 import { IConstantFlowAgreementV1 } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
 
 import { IOps } from "./gelato/IOps.sol";
@@ -23,7 +23,7 @@ import { PoolStateV1 } from "./PoolState-V1.sol";
 
 contract PoolInternalV1 is PoolStateV1 {
   using SafeMath for uint256;
-  using CFAv1Library for CFAv1Library.InitData;
+  using SuperTokenV1Library for ISuperToken;
 
   // #region =========== =============  Pool Events (supplier interaction) ============= ============= //
 
@@ -66,7 +66,7 @@ contract PoolInternalV1 is PoolStateV1 {
     if (supplier.outStream.flow > 0) {
       _redeemFlowStop(_supplier);
     } else if (supplier.inStream > 0) {
-      _cfaLib.deleteFlow(_supplier, address(this), superToken);
+      superToken.deleteFlow(_supplier, address(this));
       _updateSupplierFlow(_supplier, 0, 0, "0x");
     }
 
@@ -301,9 +301,9 @@ contract PoolInternalV1 is PoolStateV1 {
 
         ///// refactor logic
         if (newNetFlow == 0) {
-          _cfaLib.deleteFlow(address(this), _supplier, superToken);
+          superToken.deleteFlow(address(this), _supplier);
         } else {
-          newCtx = _cfaLib.deleteFlowWithCtx(_ctx, address(this), _supplier, superToken);
+          newCtx = superToken.deleteFlowWithCtx(_ctx, address(this), _supplier);
         }
 
         _cancelTask(supplier.outStream.cancelWithdrawId);
@@ -327,7 +327,7 @@ contract PoolInternalV1 is PoolStateV1 {
 
         if (currentNetFlow > 0) {
           console.log(336, superToken.balanceOf(address(this)));
-          _cfaLib.deleteFlow(_supplier, address(this), superToken);
+          superToken.deleteFlow(_supplier, address(this));
           console.log(338, superToken.balanceOf(address(this)));
         }
 
@@ -517,7 +517,7 @@ contract PoolInternalV1 is PoolStateV1 {
 
       supplier.outStream.streamDuration = streamDuration;
 
-      _cfaLib.createFlow(supplier.supplier, superToken, newOutFlow);
+      superToken.createFlow(supplier.supplier, newOutFlow);
 
       // uint256 bal = superToken.balanceOf(address(this));
       //(int256 realBal, uint256 deposit,,) = superToken.realtimeBalanceOfNow(address(this));
@@ -546,7 +546,7 @@ contract PoolInternalV1 is PoolStateV1 {
         //To DO REBALANCE
       }
 
-      _cfaLib.updateFlow(supplier.supplier, superToken, newOutFlow);
+      superToken.updateFlow(supplier.supplier, newOutFlow);
     }
     return (pool, supplier);
   }
@@ -596,7 +596,7 @@ contract PoolInternalV1 is PoolStateV1 {
     supplier.deposit = 0;
     supplier.outStream = DataTypes.OutStream(0, 0, 0, bytes32(0));
 
-    _cfaLib.deleteFlow(address(this), _supplier, superToken);
+    superToken.deleteFlow(address(this), _supplier);
     suppliersByAddress[_supplier] = supplier;
     pool = _withdrawTreasury(_supplier, _supplier, userBalance, pool);
     poolByTimestamp[block.timestamp] = pool;
