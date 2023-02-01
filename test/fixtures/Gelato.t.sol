@@ -65,7 +65,7 @@ abstract contract Gelato is Test, Config {
   function gelatoBalance() internal {
     vm.startPrank(opsExecutor);
     (bool canExec, bytes memory execData) = poolProxy.checkerLastExecution();
-    console.log(canExec);
+ 
     if (canExec) {
       bytes memory resolverData = abi.encodeWithSelector(poolProxy.checkerLastExecution.selector);
 

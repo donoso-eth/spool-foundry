@@ -27,7 +27,7 @@ contract PoolAccounting is Test, DeployPool, Report, DecodeFile {
   function testAccounting() public {
     // #region =================  FIRST PERIOD ============================= //
 
-    console.log(29);
+
 
     sendToPool(user1, 500 ether);
 
@@ -41,10 +41,10 @@ contract PoolAccounting is Test, DeployPool, Report, DecodeFile {
     vm.warp(block.timestamp + 60 days);
     int96 flowRate = int96(uint96(uint256(100 ether).div(30 days)));
 
-    console.log(2);
+
 
     startFlow(user2, flowRate);
-    console.log(3);
+ 
     checkFilePool("./test/expected/accounting/expected2.json");
     checkFileUser("./test/expected/accounting/2-user-expected1.json", user1);
     checkFileUser("./test/expected/accounting/2-user-expected2.json", user2);

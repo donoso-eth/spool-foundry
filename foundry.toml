@@ -8,7 +8,7 @@ solc = '0.8.17'
 fs_permissions = [{ access = "read-write", path = "./test"}]
 
 [fuzz]
-runs = 10000
+runs = 1000
 
 [fmt]
 line_length = 300

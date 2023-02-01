@@ -79,9 +79,9 @@ abstract contract Users is Test, Config {
 
   function startFlow(address sender, int96 flowRate) internal {
     vm.startPrank(sender);
-    console.log(93);
+
     _cfaLib.createFlow(address(poolProxy), superToken, flowRate);
-    console.log(95);
+ 
     vm.stopPrank();
   }
 
