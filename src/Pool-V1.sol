@@ -248,7 +248,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     bytes calldata _ctx
   ) external override onlyExpected(_superToken, _agreementClass) onlyHost onlyNotEmergency returns (bytes memory newCtx) {
     newCtx = _ctx;
-     console.log(25555555555555);
+    
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
@@ -274,7 +274,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   ) external override returns (bytes memory newCtx) {
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
     newCtx = _ctx;
-    console.log(277777777);
+  
   
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, 0, sender);

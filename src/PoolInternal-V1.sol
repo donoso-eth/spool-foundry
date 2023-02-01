@@ -318,9 +318,10 @@ contract PoolInternalV1 is PoolStateV1 {
         /// PREVIOUS FLOW NOT EXISTENT OR POSITIVE AND CURRENT FLOW NEGATIVE
 
         if (currentNetFlow > 0) {
-          console.log(336, superToken.balanceOf(address(this)));
+    
+
           _cfaLib.deleteFlow(_supplier, address(this), superToken);
-          console.log(338, superToken.balanceOf(address(this)));
+      
         }
 
         pool.outFlowRate += -newNetFlow;
@@ -364,8 +365,6 @@ contract PoolInternalV1 is PoolStateV1 {
 
   function _balanceTreasury(DataTypes.Pool memory currentPool) public returns (DataTypes.Pool memory) {
     lastExecution = block.timestamp;
-
-    console.log(376);
 
     (int256 balance,,,) = superToken.realtimeBalanceOfNow(address(this));
 
@@ -411,8 +410,6 @@ contract PoolInternalV1 is PoolStateV1 {
    */
   function _withdrawTreasury(address _supplier, address _receiver, uint256 withdrawAmount, DataTypes.Pool memory pool) internal returns (DataTypes.Pool memory) {
     lastExecution = block.timestamp;
-    console.log(422);
-
 
     uint256 currentThreshold = pool.outFlowBuffer;
     uint256 outFlowBuffer = 0;
@@ -429,10 +426,7 @@ contract PoolInternalV1 is PoolStateV1 {
       poolAvailable = superToken.balanceOf(address(this)) - (currentThreshold);
     }
 
-    console.log(440, poolAvailable);
-    console.log(441, superToken.balanceOf(address(this)));
-    console.log(442, currentThreshold);
-
+ 
     //// if enough in the pool is available then not go to the pool strategy
     if (poolAvailable >= withdrawAmount + outFlowBuffer) {
       //// if the withdrawal is to supplier then we must transfer

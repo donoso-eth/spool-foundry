@@ -20,9 +20,9 @@ contract PoolTest is Test, DeployPool, Report {
     payable(poolProxy).transfer(1 ether);
   }
 
-    function testFuzzRedeemFlow() public {
-       int96 flowRate = 63937141655095766; // equals = 139805 token month
-  //function testFuzzRedeemFlow(int96 flowRate) public {
+   // function testFuzzRedeemFlow() public {
+  //     int96 flowRate = 63937141655095766; // equals = 139805 token month
+  function testFuzzRedeemFlow(int96 flowRate) public {
     if (flowRate > 45000) {
        vm.assume(flowRate > 45000);
       // vm.assume(flowRate < 53937141655095766);
@@ -34,8 +34,10 @@ contract PoolTest is Test, DeployPool, Report {
       vm.expectRevert(bytes("NO_BALANCE"));
       redeemFlow(user, flowRate);
 
-      if (superToken.balanceOf(user) > uint256(uint96(flowRate)) * 4 * 60 * 60) {
+      if (superToken.balanceOf(user) > uint256(uint96(flowRate)) * 52 * 60 * 60) {
         startFlow(user, flowRate);
+        uint256 depo = getFlowDeposit(user, address(poolProxy));
+      
 
         vm.warp(block.timestamp + 24 * 3600);
 
@@ -44,24 +46,14 @@ contract PoolTest is Test, DeployPool, Report {
 
         vm.warp(block.timestamp + 24 * 3600);
      
-        //invariantTest();
-        uint256 depo = getFlowDeposit(user, address(poolProxy));
-        uint256 balUser1 = superToken.balanceOf(user);
-        console.log('bal user....,: ',balUser1 );
-        console.log('depo....,: ', depo);
-          console.log('total bal user....,: ',balUser1 + depo);
-        redeemFlow(user, flowRate);
-        depo = getFlowDeposit(user, address(poolProxy));
-        console.log('depoin...: ',depo);
-        balUser1 = superToken.balanceOf(user);
-        console.log('bal user....,: ',balUser1 + depo);
-        uint256 depoOut = getFlowDeposit(address(poolProxy), user);
-        console.log(49, depoOut);
-        invariantTest();
-        depo = getFlowDeposit(user, address(poolProxy));
-        console.log(47, depo);
 
-        // invariantTest();
+        uint256 balUser1 = superToken.balanceOf(user);
+  
+        redeemFlow(user, flowRate);
+       
+        invariantTest();
+ 
+     
       }
      // }
     }
@@ -126,7 +118,7 @@ contract PoolTest is Test, DeployPool, Report {
     uint256 amount = 50 ether;
     sendToPool(user, amount);
     initBalance = calculatePoolTotalBalance();
-    invariantTest();
+    invariantTest();  
     assertApproxEqRel(150 ether, initBalance, 1e12, "CLOSE_ACCOUNT_BALANCE-2");
     console.log("CLOSE_ACCOUNT_BALANCE ----> ", initBalance);
 
@@ -289,7 +281,7 @@ contract PoolTest is Test, DeployPool, Report {
     invariantTest();
 
     withdrawFromPool(user, withdrawAmount);
-    console.log(219);
+ 
     invariantTest();
 
     vm.expectRevert(bytes("NOT_ENOUGH_BALANCE"));
