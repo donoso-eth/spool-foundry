@@ -57,7 +57,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
    * @notice initializer of the Pool
    */
   function initialize(DataTypes.PoolInitializer memory poolInit) external initializer {
-
     //// ERC
     _name = poolInit.name;
     _symbol = poolInit.symbol;
@@ -71,7 +70,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     token = poolInit.token;
     owner = poolInit.owner;
     poolFactory = msg.sender;
-
 
     _cfaLib = CFAv1Library.InitData(host, cfa);
 
@@ -248,11 +246,10 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     bytes calldata _ctx
   ) external override onlyExpected(_superToken, _agreementClass) onlyHost onlyNotEmergency returns (bytes memory newCtx) {
     newCtx = _ctx;
-    
+
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
-
 
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, inFlowRate, sender);
@@ -274,15 +271,13 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   ) external override returns (bytes memory newCtx) {
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
     newCtx = _ctx;
-  
-  
+
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, 0, sender);
       emitEvents(sender);
       bytes memory payload = abi.encode("");
       emit Events.SupplierEvent(DataTypes.SupplierEvent.STREAM_STOP, payload, block.timestamp, sender);
     } else if (sender == address(this)) {
-      
       callInternal(abi.encodeWithSignature("_redeemFlowStop(address)", receiver));
 
       emitEvents(receiver);
@@ -307,7 +302,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
 
     (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
 
- 
     if (receiver == address(this)) {
       newCtx = _updateStreamRecord(newCtx, inFlowRate, sender);
 

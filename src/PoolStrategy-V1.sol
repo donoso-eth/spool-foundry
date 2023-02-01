@@ -37,8 +37,9 @@ contract PoolStrategyV1 is Initializable, UUPSProxiable, IPoolStrategyV1 {
 
   address owner;
 
+  IPoolV1 pool;
 
-  IPoolV1 pool;   ///SuperPool Pool
+  ///SuperPool Pool
 
   IPool aavePool; //// aave Pool to deposit
 

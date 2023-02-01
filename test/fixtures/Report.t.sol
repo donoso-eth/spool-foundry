@@ -31,23 +31,19 @@ abstract contract Report is Test, Users, Gelato {
     DataTypes.Pool memory currentPool = poolProxy.getLastPool();
 
     usersBalance = usersBalance + currentPool.yieldObject.protocolYield;
-  
   }
 
   function calculatePoolTotalBalance() internal view returns (uint256 poolBalance) {
     uint256 superTokenBalance = superToken.balanceOf(address(poolProxy));
- 
+
     uint256 aaveBalance = aToken.balanceOf(address(strategyProxy));
- 
+
     uint256 depositUser1 = getFlowDeposit(address(poolProxy), user1);
     uint256 depositUser2 = getFlowDeposit(address(poolProxy), user2);
     uint256 depositUser3 = getFlowDeposit(address(poolProxy), user3);
     uint256 depositUser4 = getFlowDeposit(address(poolProxy), user4);
 
-
     uint256 deposit = depositUser1 + depositUser2 + depositUser3 + depositUser4;
     poolBalance = superTokenBalance + aaveBalance + deposit;
-
-
   }
 }

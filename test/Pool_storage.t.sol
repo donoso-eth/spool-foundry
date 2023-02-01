@@ -28,41 +28,30 @@ contract PoolStorage is Test, DeployPool, Report, DecodeFile {
   }
 
   function _testStorage() public {
-  
     sendToPool(user1, 500 ether);
 
     int96 flowRate = int96(uint96(uint256(100 ether).div(30 days)));
 
     vm.warp(block.timestamp + 60 days);
 
-    startFlow(user1,flowRate) ;
+    startFlow(user1, flowRate);
 
     console.log(user1);
-    
+
     console.log(poolProxy.owner());
     console.log(address(poolFactoryProxy));
 
-  
-
     console.logBytes32(bytes32(abi.encode(1_000_000)));
 
-   //  console.logBytes32(bytes32(abi.encodePacked(poolProxy.lastExecution)));
-     console.log(address(poolInternal));
+    //  console.logBytes32(bytes32(abi.encodePacked(poolProxy.lastExecution)));
+    console.log(address(poolInternal));
 
-    for (uint8 i = 0;i<30;i++){
-          bytes32 test = (PoolProxyWrapper(payable(poolProxy)).readStorageSlot(i)); 
-          console.logBytes32(test);
+    for (uint8 i = 0; i < 30; i++) {
+      bytes32 test = (PoolProxyWrapper(payable(poolProxy)).readStorageSlot(i));
+      console.logBytes32(test);
     }
 
-
-  
-
     //assertEq(test, bytes32(abi.encodePacked("sp", "DAI")));
-
-  
-  
-
-
 
     // test = poolProxy.readStorageSlot(5);
     // assertEq(test, bytes32(abi.encodePacked(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38))));

@@ -28,7 +28,6 @@ contract PoolInternalV1 is PoolStateV1 {
   // #region =========== =============  Pool Events (supplier interaction) ============= ============= //
 
   function _tokensReceived(address _supplier, uint256 amount) external {
-
     _updateSupplierDeposit(_supplier, amount, 0);
     DataTypes.Pool memory pool = poolByTimestamp[block.timestamp];
     pool = _balanceTreasury(pool);
@@ -79,7 +78,6 @@ contract PoolInternalV1 is PoolStateV1 {
   }
 
   // #endregion User Interaction PoolEvents
-
 
   // #region =========== =============  POOL UPDATE ============= ============= //
 
@@ -291,7 +289,6 @@ contract PoolInternalV1 is PoolStateV1 {
 
         pool.inFlowRate = pool.inFlowRate + newNetFlow;
 
- 
         if (newNetFlow == 0) {
           _cfaLib.deleteFlow(address(this), _supplier, superToken);
         } else {
@@ -318,10 +315,7 @@ contract PoolInternalV1 is PoolStateV1 {
         /// PREVIOUS FLOW NOT EXISTENT OR POSITIVE AND CURRENT FLOW NEGATIVE
 
         if (currentNetFlow > 0) {
-    
-
           _cfaLib.deleteFlow(_supplier, address(this), superToken);
-      
         }
 
         pool.outFlowRate += -newNetFlow;
@@ -426,7 +420,6 @@ contract PoolInternalV1 is PoolStateV1 {
       poolAvailable = superToken.balanceOf(address(this)) - (currentThreshold);
     }
 
- 
     //// if enough in the pool is available then not go to the pool strategy
     if (poolAvailable >= withdrawAmount + outFlowBuffer) {
       //// if the withdrawal is to supplier then we must transfer
@@ -440,8 +433,7 @@ contract PoolInternalV1 is PoolStateV1 {
 
         pool.yieldObject.yieldSnapshot += poolAvailable - (withdrawAmount + outFlowBuffer);
       }
-
-       } else {
+    } else {
       //// not enough balance then we must withdraw from strategy
 
       uint256 balance = IPoolStrategyV1(poolStrategy).balanceOf();
@@ -532,7 +524,6 @@ contract PoolInternalV1 is PoolStateV1 {
         uint256 toWithDraw = increaseBuffer + initialWithdraw - oldInitialWithdraw;
 
         pool = _withdrawTreasury(supplier.supplier, address(this), toWithDraw, pool);
-        
       }
 
       _cfaLib.updateFlow(supplier.supplier, superToken, newOutFlow);
@@ -574,7 +565,6 @@ contract PoolInternalV1 is PoolStateV1 {
     DataTypes.Supplier memory supplier = suppliersByAddress[_supplier];
     DataTypes.Pool memory pool = poolByTimestamp[block.timestamp];
 
-  
     uint256 userBalance = _getSupplierBalance(_supplier).div(PRECISSION);
 
     uint256 oldOutFlowBuffer = POOL_BUFFER.mul(uint96(supplier.outStream.flow));
@@ -650,7 +640,6 @@ contract PoolInternalV1 is PoolStateV1 {
   }
 
   // #endregion =========== =============  Modifiers ============= ============= //
-
 
   /**
    * @notice Calculate the yield earned by the suplier

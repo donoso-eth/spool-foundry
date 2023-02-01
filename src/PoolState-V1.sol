@@ -15,8 +15,7 @@ import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 
 contract PoolStateV1 {
-
-   //// PARAMETERS
+  //// PARAMETERS
 
   uint256 constant MAX_INT = 2 ** 256 - 1;
 
@@ -30,8 +29,6 @@ contract PoolStateV1 {
   uint256 constant BALANCE_TRIGGER_TIME = 24 * 3600;
 
   uint256 constant PROTOCOL_FEE = 3;
-
-
 
   bool public emergency = false;
 
@@ -80,6 +77,4 @@ contract PoolStateV1 {
   CFAv1Library.InitData _cfaLib;
   ISuperfluid host; // host
   IConstantFlowAgreementV1 cfa; // the stored constant flow agreement class address
-
-
 }
