@@ -9,11 +9,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "typechain":"typechain --target ethers-v5 'out/**/!(*.t|test).sol/!(*.abi).json' --out-dir typechain-types"
+    "typechain": "typechain --target ethers-v5 'out/**/!(*.t|test).sol/!(*.abi).json' --out-dir typechain-types"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@superfluid-finance/ethereum-contracts": "^1.5.0",
     "@typechain/ethers-v5": "^10.2.0",
     "@types/node": "^18.11.9",
     "dotenv": "^16.0.3",

@@ -13,7 +13,7 @@ import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/Saf
 import { UUPSProxiable } from "./upgradability/UUPSProxiable.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-import { CFAv1Library } from "@superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
+import { SuperTokenV1Library } from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 import { IConstantFlowAgreementV1 } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
 import { ISuperfluid, ISuperAgreement, ISuperToken, ISuperApp, SuperAppDefinitions } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 import { SuperAppBase } from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBase.sol";
@@ -51,7 +51,7 @@ import { Events } from "./libraries/Events.sol";
  */
 contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC777Recipient, IPoolV1, IERC20 {
   using SafeMath for uint256;
-  using CFAv1Library for CFAv1Library.InitData;
+  using SuperTokenV1Library for ISuperToken;
 
   /**
    * @notice initializer of the Pool
@@ -72,8 +72,6 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     poolFactory = msg.sender;
 
     //MAX_INT = 2 ** 256 - 1;
-
-    _cfaLib = CFAv1Library.InitData(host, cfa);
 
     //// tokens receie implementation
     IERC1820Registry _erc1820 = IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
@@ -252,7 +250,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     console.log("24---GGGGGGGGGGGUUUAUUAUAUAUUA");
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
-    (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
+    int96 inFlowRate = superToken.getFlowRate(sender, address(this));
 
     //// If In-Stream we will request a pool update
 
@@ -308,7 +306,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
     console.log("305---GGGGGGGGGGGUUUAUUAUAUAUUA");
     (address sender, address receiver) = abi.decode(_agreementData, (address, address));
 
-    (, int96 inFlowRate,,) = cfa.getFlow(superToken, sender, address(this));
+    int96 inFlowRate = superToken.getFlowRate(sender, address(this));
 
     // If In-Stream we will request a pool update
     if (receiver == address(this)) {
@@ -739,7 +737,7 @@ contract PoolV1 is PoolStateV1, Initializable, UUPSProxiable, SuperAppBase, IERC
   function emergencyCloseStream(address[] memory sender, address[] memory receiver) external onlyOwner {
     if (emergency) {
       for (uint256 i = 0; i < sender.length; i++) {
-        _cfaLib.deleteFlow(sender[i], receiver[i], superToken);
+        superToken.deleteFlow(sender[i], receiver[i]);
         if (sender[i] == address(this)) {
           bytes32 taskId = suppliersByAddress[receiver[i]].outStream.cancelWithdrawId;
           ops.cancelTask(taskId);
