@@ -15,6 +15,24 @@ import { DataTypes } from "./libraries/DataTypes.sol";
 import { Events } from "./libraries/Events.sol";
 
 contract PoolStateV1 {
+
+   //// PARAMETERS
+
+  uint256 constant MAX_INT = 2 ** 256 - 1;
+
+  uint256 constant PRECISSION = 1_000_000;
+
+  uint256 constant SUPERFLUID_DEPOSIT = 4 * 3600;
+  uint256 constant POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
+  uint256 constant MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 hour minimum flow == Buffer
+
+  uint256 constant DEPOSIT_TRIGGER_AMOUNT = 100 ether;
+  uint256 constant BALANCE_TRIGGER_TIME = 24 * 3600;
+
+  uint256 constant PROTOCOL_FEE = 3;
+
+
+
   bool public emergency = false;
 
   //ERC20
@@ -47,21 +65,6 @@ contract PoolStateV1 {
   address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
   bytes32 public balanceTreasuryTask;
 
-  //// PARAMETERS
-
-  uint256 constant MAX_INT = 2 ** 256 - 1;
-
-  uint256 constant PRECISSION = 1_000_000;
-
-  uint256 constant SUPERFLUID_DEPOSIT = 4 * 3600;
-  uint256 constant POOL_BUFFER = 3600; // buffer to keep in the pool (outstream 4hours deposit) + outstream partial deposits
-  uint256 constant MIN_OUTFLOW_ALLOWED = 24 * 3600; // 1 hour minimum flow == Buffer
-
-  uint256 constant DEPOSIT_TRIGGER_AMOUNT = 100 ether;
-  uint256 constant BALANCE_TRIGGER_TIME = 24 * 3600;
-
-  uint256 constant PROTOCOL_FEE = 3;
-
   address public poolStrategy;
   address public poolInternal;
 
@@ -77,4 +80,6 @@ contract PoolStateV1 {
   CFAv1Library.InitData _cfaLib;
   ISuperfluid host; // host
   IConstantFlowAgreementV1 cfa; // the stored constant flow agreement class address
+
+
 }

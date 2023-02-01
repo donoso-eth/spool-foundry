@@ -28,25 +28,41 @@ contract PoolStorage is Test, DeployPool, Report, DecodeFile {
   }
 
   function _testStorage() public {
-    // #region =================  FIRST PERIOD ============================= //
-
+  
     sendToPool(user1, 500 ether);
 
-    // checkFilePool("./test/expected/test-stream/expected1.json");
-    // checkFileUser("./test/expected/test-stream/1-user-expected1.json", user1);
+    int96 flowRate = int96(uint96(uint256(100 ether).div(30 days)));
 
-    // #endregion ============== FIRST PERIOD ============================= //
+    vm.warp(block.timestamp + 60 days);
 
-    bytes32 test = PoolProxyWrapper(payable(poolProxy)).readStorageSlot(5);
-    //console.logBytes32()
-    console.log(42);
-    //console.log(string(bytes(test)));
-    console.log(string((abi.encodePacked("sp", "USDC"))));
-    assertEq(test, bytes32(abi.encodePacked("sp", "USDC")));
+    startFlow(user1,flowRate) ;
 
-    string memory aa = string(abi.encodePacked("sp", "USDC"));
-    console.logBytes32(bytes32(bytes(aa)));
-    console.log(aa);
+    console.log(user1);
+    
+    console.log(poolProxy.owner());
+    console.log(address(poolFactoryProxy));
+
+  
+
+    console.logBytes32(bytes32(abi.encode(1_000_000)));
+
+   //  console.logBytes32(bytes32(abi.encodePacked(poolProxy.lastExecution)));
+     console.log(address(poolInternal));
+
+    for (uint8 i = 0;i<30;i++){
+          bytes32 test = (PoolProxyWrapper(payable(poolProxy)).readStorageSlot(i)); 
+          console.logBytes32(test);
+    }
+
+
+  
+
+    //assertEq(test, bytes32(abi.encodePacked("sp", "DAI")));
+
+  
+  
+
+
 
     // test = poolProxy.readStorageSlot(5);
     // assertEq(test, bytes32(abi.encodePacked(address(0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38))));
